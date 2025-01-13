@@ -79,34 +79,6 @@ const phoneRules = reactive<FormRules>({
 
 /** 忘记密码校验 */
 const updateRules = reactive<FormRules>({
-  phone: [
-    {
-      validator: (rule, value, callback) => {
-        if (value === "") {
-          callback(new Error(transformI18n($t("login.purePhoneReg"))));
-        } else if (!isPhone(value)) {
-          callback(new Error(transformI18n($t("login.purePhoneCorrectReg"))));
-        } else {
-          callback();
-        }
-      },
-      trigger: "blur"
-    }
-  ],
-  verifyCode: [
-    {
-      validator: (rule, value, callback) => {
-        if (value === "") {
-          callback(new Error(transformI18n($t("login.pureVerifyCodeReg"))));
-        } else if (!REGEXP_SIX.test(value)) {
-          callback(new Error(transformI18n($t("login.pureVerifyCodeSixReg"))));
-        } else {
-          callback();
-        }
-      },
-      trigger: "blur"
-    }
-  ],
   password: [
     {
       validator: (rule, value, callback) => {

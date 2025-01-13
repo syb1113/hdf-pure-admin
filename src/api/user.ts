@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-
+import { baseUrlAuth, baseUrlAdmin } from "@/api/utils";
 export type UserResult = {
   success: boolean;
   data: {
@@ -70,14 +70,20 @@ type ResultTable = {
 
 /** 登录 */
 export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "/login", { data });
+  console.log(1);
+  return http.request<UserResult>("post", baseUrlAuth("admin_login"), { data });
 };
 
 /** 刷新`token` */
 export const refreshTokenApi = (data?: object) => {
   return http.request<RefreshTokenResult>("post", "/refresh-token", { data });
 };
-
+/** 管理员注册 */
+export const getReg = (data?: object) => {
+  return http.request<UserResult>("post", baseUrlAdmin("managers"), {
+    data
+  });
+};
 /** 账户设置-个人信息 */
 export const getMine = (data?: object) => {
   return http.request<UserInfoResult>("get", "/mine", { data });

@@ -12,14 +12,17 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Lock from "@iconify-icons/ri/lock-fill";
 import Iphone from "@iconify-icons/ep/iphone";
 import User from "@iconify-icons/ri/user-3-fill";
+import { getReg } from "@/api/user";
+import { initRouter, getTopMenu } from "@/router/utils";
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
 const checked = ref(false);
 const loading = ref(false);
+const disabled = ref(false);
+const router = useRouter();
 const ruleForm = reactive({
-  username: "",
-  phone: "",
-  verifyCode: "",
+  userName: "",
   password: "",
   repeatPassword: ""
 });
@@ -49,12 +52,43 @@ const onUpdate = async (formEl: FormInstance | undefined) => {
     if (valid) {
       if (checked.value) {
         // 模拟请求，需根据实际开发进行修改
-        setTimeout(() => {
-          message(transformI18n($t("login.pureRegisterSuccess")), {
-            type: "success"
-          });
-          loading.value = false;
-        }, 2000);
+        const data = {
+          userName: ruleForm.userName,
+          password: ruleForm.password
+        };
+        getReg(data).then((res: any) => {
+          if (res.success) {
+            useUserStoreHook()
+              .loginByUsername({
+                userName: ruleForm.userName,
+                password: ruleForm.password
+              })
+              .then((res: any) => {
+                if (res.success) {
+                  // 获取后端路由
+                  return initRouter().then(() => {
+                    disabled.value = true;
+                    router
+                      .push(getTopMenu(true).path)
+                      .then(() => {
+                        setTimeout(() => {
+                          message("注册成功，即将登录", {
+                            type: "success"
+                          });
+                          loading.value = false;
+                        }, 1000);
+                      })
+                      .finally(() => (disabled.value = false));
+                  });
+                } else {
+                  message("用户名已注册", { type: "error" });
+                }
+              });
+          } else {
+            loading.value = false;
+            message("用户名已注册", { type: "error" });
+          }
+        });
       } else {
         loading.value = false;
         message(transformI18n($t("login.pureTickPrivacy")), {
@@ -89,10 +123,10 @@ function onBack() {
             trigger: 'blur'
           }
         ]"
-        prop="username"
+        prop="userName"
       >
         <el-input
-          v-model="ruleForm.username"
+          v-model="ruleForm.userName"
           clearable
           :placeholder="t('login.pureUsername')"
           :prefix-icon="useRenderIcon(User)"
@@ -100,7 +134,7 @@ function onBack() {
       </el-form-item>
     </Motion>
 
-    <Motion :delay="100">
+    <!-- <Motion :delay="100">
       <el-form-item prop="phone">
         <el-input
           v-model="ruleForm.phone"
@@ -133,7 +167,7 @@ function onBack() {
           </el-button>
         </div>
       </el-form-item>
-    </Motion>
+    </Motion> -->
 
     <Motion :delay="200">
       <el-form-item prop="password">
