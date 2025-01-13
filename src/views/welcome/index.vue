@@ -3,10 +3,8 @@ import { ref, markRaw } from "vue";
 import ReCol from "@/components/ReCol";
 import { useDark, randomGradient } from "./utils";
 import WelcomeTable from "./components/table/index.vue";
-import { ReNormalCountTo } from "@/components/ReCountTo";
-import { useRenderFlicker } from "@/components/ReFlicker";
 import { ChartBar, ChartLine, ChartRound } from "./components/charts";
-import Segmented, { type OptionsType } from "@/components/ReSegmented";
+
 import { chartData, barChartData, progressData, latestNewsData } from "./data";
 
 defineOptions({
@@ -16,7 +14,7 @@ defineOptions({
 const { isDark } = useDark();
 
 let curWeek = ref(1); // 0上周、1本周
-const optionsBasis: Array<OptionsType> = [
+const optionsBasis: Array<Object> = [
   {
     label: "上周"
   },
@@ -70,12 +68,6 @@ const optionsBasis: Array<OptionsType> = [
           </div>
           <div class="flex justify-between items-start mt-3">
             <div class="w-1/2">
-              <ReNormalCountTo
-                :duration="item.duration"
-                :fontSize="'1.6em'"
-                :startVal="100"
-                :endVal="item.value"
-              />
               <p class="font-medium text-green-500">{{ item.percent }}</p>
             </div>
             <ChartLine
@@ -220,15 +212,6 @@ const optionsBasis: Array<OptionsType> = [
                 :key="index"
                 center
                 placement="top"
-                :icon="
-                  markRaw(
-                    useRenderFlicker({
-                      background: randomGradient({
-                        randomizeHue: true
-                      })
-                    })
-                  )
-                "
                 :timestamp="item.date"
               >
                 <p class="text-text_color_regular text-sm">

@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+
+const { VITE_BASE_URL } = import.meta.env;
 import {
   type userType,
   store,
@@ -82,13 +84,14 @@ export const useUserStore = defineStore("pure-user", {
           .then((res: any) => {
             const result = {
               accessToken: res.data,
-              avatar: "https://avatars.githubusercontent.com/u/44761321",
+              avatar:
+                VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg",
               expires: new Date("2030/10/30 00:00:00"),
               nickname: data.userName,
               permissions: ["*:*:*"],
               refreshToken: res.data,
               roles: ["admin"],
-              username: "admin",
+              username: data.userName,
               userId: data.userId
             };
             if (res?.success) setToken(result);

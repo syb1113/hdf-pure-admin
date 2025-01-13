@@ -4,7 +4,6 @@ import { formUpload } from "@/api/mock";
 import { message } from "@/utils/message";
 import { type UserInfo, getMine } from "@/api/user";
 import type { FormInstance, FormRules } from "element-plus";
-import ReCropperPreview from "@/components/ReCropperPreview";
 import { createFormData, deviceDetection } from "@pureadmin/utils";
 import uploadLine from "@iconify-icons/ri/upload-line";
 
@@ -177,7 +176,6 @@ getMine().then(res => {
       :before-close="handleClose"
       :fullscreen="deviceDetection()"
     >
-      <ReCropperPreview ref="cropRef" :imgSrc="imgSrc" @cropper="onCropper" />
       <template #footer>
         <div class="dialog-footer">
           <el-button bg text @click="handleClose">取消</el-button>

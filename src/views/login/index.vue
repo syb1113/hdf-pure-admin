@@ -15,14 +15,14 @@ import { useLayout } from "@/layout/hooks/useLayout";
 import LoginRegist from "./components/LoginRegist.vue";
 import LoginUpdate from "./components/LoginUpdate.vue";
 import { useUserStoreHook } from "@/store/modules/user";
-import { initRouter, getTopMenu } from "@/router/utils";
+import { addPathMatch, getTopMenu } from "@/router/utils";
+import { usePermissionStoreHook } from "@/store/modules/permission";
 import { bg, avatar, illustration } from "./utils/static";
 import { ReImageVerify } from "@/components/ReImageVerify";
 import { ref, toRaw, reactive, watch, computed } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
-
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import globalization from "@/assets/svg/globalization.svg?component";
@@ -72,16 +72,15 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         })
         .then((res: any) => {
           if (res.success) {
-            // 获取后端路由
-            return initRouter().then(() => {
-              disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
-                  message(t("login.pureLoginSuccess"), { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
-            });
+            usePermissionStoreHook().handleWholeMenus([]);
+            addPathMatch();
+            disabled.value = true;
+            router
+              .push(getTopMenu(true).path)
+              .then(() => {
+                message(t("login.pureLoginSuccess"), { type: "success" });
+              })
+              .finally(() => (disabled.value = false));
           } else {
             message(res.errorMessage, { type: "error" });
           }
