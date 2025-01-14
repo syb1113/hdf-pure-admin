@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { utils, writeFile } from "xlsx";
+import { requestDoctoresList } from "@/api/doctorManagement";
+import { message } from "@/utils/message";
+const { VITE_BASE_URL } = import.meta.env;
+
 defineOptions({
   name: "doctorList"
 });
@@ -31,10 +35,14 @@ interface TableData {
   hospitalInfo: SpecificInfor; //医院信息
   [propName: string]: string | number | SpecificInfor;
 }
+onMounted(() => {
+  getData();
+});
 const handleClick = () => {
   console.log("click");
 };
-
+const doctorAvatar =
+  VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg";
 const columns = [
   { title: "医生名字", dataKey: "name" },
   { title: "医生简介", dataKey: "desc" },
@@ -48,7 +56,17 @@ const columns = [
 ];
 
 const tableData = ref<Array<TableData>>([]);
-
+const getData = async () => {
+  await requestDoctoresList().then((res: any) => {
+    const { data, success, errorMessage } = res;
+    console.log(data);
+    if (success) {
+      tableData.value = data.list;
+    } else {
+      message("获取失败", { type: "error" });
+    }
+  });
+};
 const exportExcel = () => {
   const res = tableData.value.map(item => {
     return columns.map(column => item[column.dataKey]);
@@ -72,7 +90,7 @@ const exportExcel = () => {
     <el-button type="primary" @click="exportExcel">导出Excel</el-button>
     <div class="h-[25rem] mt-3">
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column fixed="left" prop="index" label="#" width="100" />
+        <el-table-column fixed="left" type="index" label="#" width="100" />
         <el-table-column prop="name" label="医生名字" width="120" />
         <el-table-column prop="desc" label="医生简介" width="120" />
         <el-table-column prop="tags" label="医生特长" width="120">
@@ -86,7 +104,7 @@ const exportExcel = () => {
             <el-avatar
               shape="square"
               :size="50"
-              :src="row.avatar ? row.avatar : '@/assets/user.jpg'"
+              :src="row.avatar ? row.avatar : doctorAvatar"
             />
           </template>
         </el-table-column>
