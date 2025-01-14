@@ -30,7 +30,7 @@ import Lock from "@iconify-icons/ri/lock-fill";
 import Check from "@iconify-icons/ep/check";
 import User from "@iconify-icons/ri/user-3-fill";
 import Info from "@iconify-icons/ri/information-line";
-
+import Vcode from "vue3-puzzle-vcode";
 defineOptions({
   name: "Login"
 });
@@ -45,6 +45,7 @@ const ruleFormRef = ref<FormInstance>();
 const currentPage = computed(() => {
   return useUserStoreHook().currentPage;
 });
+const verifyShow = ref(false);
 
 const { t } = useI18n();
 const { initStorage } = useLayout();
@@ -59,33 +60,47 @@ const ruleForm = reactive({
   password: "",
   verifyCode: ""
 });
+function onSuccess() {
+  verifyShow.value = false;
+  requesrLogin();
+}
 
+function onFail() {
+  console.log("验证失败");
+}
+const requesrLogin = () => {
+  useUserStoreHook()
+    .loginByUsername({
+      userName: ruleForm.userName,
+      password: ruleForm.password
+    })
+    .then((res: any) => {
+      if (res.success) {
+        usePermissionStoreHook().handleWholeMenus([]);
+        addPathMatch();
+        disabled.value = true;
+        router
+          .push(getTopMenu(true).path)
+          .then(() => {
+            message(t("login.pureLoginSuccess"), { type: "success" });
+          })
+          .finally(() => (disabled.value = false));
+      } else {
+        message(res.errorMessage, { type: "error" });
+      }
+    })
+    .finally(() => (loading.value = false));
+};
 const onLogin = async (formEl: FormInstance | undefined) => {
+  if (imgCode.value != ruleForm.verifyCode) {
+    message(t("login.pureVerifyCodeCorrectReg"), { type: "warning" });
+    return;
+  }
   if (!formEl) return;
   await formEl.validate(valid => {
     if (valid) {
       loading.value = true;
-      useUserStoreHook()
-        .loginByUsername({
-          userName: ruleForm.userName,
-          password: ruleForm.password
-        })
-        .then((res: any) => {
-          if (res.success) {
-            usePermissionStoreHook().handleWholeMenus([]);
-            addPathMatch();
-            disabled.value = true;
-            router
-              .push(getTopMenu(true).path)
-              .then(() => {
-                message(t("login.pureLoginSuccess"), { type: "success" });
-              })
-              .finally(() => (disabled.value = false));
-          } else {
-            message(res.errorMessage, { type: "error" });
-          }
-        })
-        .finally(() => (loading.value = false));
+      verifyShow.value = true;
     }
   });
 };
@@ -215,7 +230,16 @@ watch(loginDay, value => {
             </Motion>
 
             <Motion :delay="200">
-              <el-form-item prop="verifyCode">
+              <el-form-item
+                prop="verifyCode"
+                :rules="[
+                  {
+                    required: true,
+                    message: transformI18n($t('login.pureVerifyCodeReg')),
+                    trigger: 'blur'
+                  }
+                ]"
+              >
                 <el-input
                   v-model="ruleForm.verifyCode"
                   clearable
@@ -296,6 +320,13 @@ watch(loginDay, value => {
               </el-form-item>
             </Motion> -->
           </el-form>
+          <el-dialog v-model="verifyShow" width="350"
+            ><Vcode
+              :show="true"
+              type="inside"
+              @fail="onFail"
+              @success="onSuccess"
+          /></el-dialog>
 
           <Motion v-if="currentPage === 0" :delay="350">
             <el-form-item>
@@ -330,13 +361,7 @@ watch(loginDay, value => {
       class="w-full flex-c absolute bottom-3 text-sm text-[rgba(0,0,0,0.6)] dark:text-[rgba(220,220,242,0.8)]"
     >
       Copyright © 2020-present
-      <a
-        class="hover:text-primary"
-        href="https://github.com/pure-admin"
-        target="_blank"
-      >
-        &nbsp;{{ title }}
-      </a>
+      <a class="hover:text-primary" target="_blank"> &nbsp;{{ title }} </a>
     </div>
   </div>
 </template>

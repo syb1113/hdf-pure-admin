@@ -22,7 +22,6 @@ import { userKey, type DataInfo } from "@/utils/auth";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
-const IFrame = () => import("@/layout/frame.vue");
 // https://cn.vitejs.dev/guide/features.html#glob-import
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
@@ -312,7 +311,7 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
     if (v?.children && v.children.length && !v.name)
       v.name = (v.children[0].name as string) + "Parent";
     if (v.meta?.frameSrc) {
-      v.component = IFrame;
+      // v.component = IFrame;
     } else {
       // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会跟path保持一致）
       const index = v?.component
