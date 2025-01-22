@@ -3,8 +3,10 @@ import { ref, onMounted } from "vue";
 import { utils, writeFile } from "xlsx";
 import { requestDoctoresList } from "@/api/doctorManagement";
 import { message } from "@/utils/message";
-const { VITE_BASE_URL } = import.meta.env;
+import doctoreAddDialog from "./components/doctoreAddDialog.vue";
+import { Plus } from "@element-plus/icons-vue";
 
+const { VITE_BASE_URL } = import.meta.env;
 defineOptions({
   name: "doctorList"
 });
@@ -38,6 +40,8 @@ interface TableData {
 onMounted(() => {
   getData();
 });
+
+const doctoreAddVisible = ref<boolean>(false);
 const handleClick = () => {
   console.log("click");
 };
@@ -48,11 +52,11 @@ const columns = [
   { title: "医生简介", dataKey: "desc" },
   { title: "医生特长", dataKey: "tags" },
   { title: "医生简介", dataKey: "desc" },
-  { title: "医生部门", dataKey: "state" },
-  { title: "医生职位", dataKey: "city" },
-  { title: "所属医院", dataKey: "address" },
-  { title: "医院电话", dataKey: "zip" },
-  { title: "医院地址", dataKey: "tag" }
+  { title: "医生部门", dataKey: item => item.departmentInfo?.name },
+  { title: "医生职位", dataKey: item => item.doctorTitleInfo?.name },
+  { title: "所属医院", dataKey: item => item.hospitalInfo?.name },
+  { title: "医院电话", dataKey: item => item.hospitalInfo?.phone },
+  { title: "医院地址", dataKey: item => item.hospitalInfo?.address }
 ];
 
 const tableData = ref<Array<TableData>>([]);
@@ -69,24 +73,34 @@ const getData = async () => {
 };
 const exportExcel = () => {
   const res = tableData.value.map(item => {
-    return columns.map(column => item[column.dataKey]);
+    return columns.map(column => {
+      if (typeof column.dataKey === "function") {
+        return column.dataKey(item);
+      }
+      return item[column.dataKey];
+    });
   });
 
   const titleList = columns.map(column => column.title);
-
   res.unshift(titleList);
 
   const workSheet = utils.aoa_to_sheet(res);
   const workBook = utils.book_new();
 
   utils.book_append_sheet(workBook, workSheet, "数据报表");
-
   writeFile(workBook, "医生列表.xlsx");
+};
+
+const requestDoctoreAdd = () => {
+  doctoreAddVisible.value = true;
 };
 </script>
 
 <template>
   <el-card shadow="never">
+    <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
+      >添加医生</el-button
+    >
     <el-button type="primary" @click="exportExcel">导出Excel</el-button>
     <div class="h-[25rem] mt-3">
       <el-table :data="tableData" style="width: 100%">
@@ -98,7 +112,7 @@ const exportExcel = () => {
             <el-tag type="success">{{ row.tags }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="content" label="医生描述" width="600" />
+        <el-table-column prop="content" label="医生描述" width="160" />
         <el-table-column prop="avatar" label="证件照" width="120">
           <template #default="{ row }">
             <el-avatar
@@ -108,25 +122,29 @@ const exportExcel = () => {
             />
           </template>
         </el-table-column>
-        <el-table-column prop="avatar" label="所属部门" width="120">
+        <el-table-column prop="departmentInfoName" label="所属部门" width="120">
           <template #default="{ row }">
             <el-text class="mx-1">{{ row.departmentInfo.name }}</el-text>
           </template> </el-table-column
-        ><el-table-column prop="avatar" label="医生职位" width="120">
+        ><el-table-column
+          prop="doctorTitleInfoName"
+          label="医生职位"
+          width="120"
+        >
           <template #default="{ row }">
             <el-text class="mx-1">{{ row.doctorTitleInfo.name }}</el-text>
           </template> </el-table-column
-        ><el-table-column prop="avatar" label="所属医院" width="120">
+        ><el-table-column prop="hospitalInfoName" label="所属医院" width="120">
           <template #default="{ row }">
             <el-text class="mx-1">{{ row.hospitalInfo.name }}</el-text>
           </template>
         </el-table-column>
-        <el-table-column prop="avatar" label="医院电话" width="120">
+        <el-table-column prop="phone" label="医院电话" width="120">
           <template #default="{ row }">
             <el-text class="mx-1">{{ row.hospitalInfo.phone }}</el-text>
           </template>
         </el-table-column>
-        <el-table-column prop="avatar" label="医院地址" width="120">
+        <el-table-column prop="address" label="医院地址" width="120">
           <template #default="{ row }">
             <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
           </template>
@@ -143,4 +161,6 @@ const exportExcel = () => {
       </el-table>
     </div>
   </el-card>
+
+  <doctoreAddDialog v-model="doctoreAddVisible" />
 </template>
