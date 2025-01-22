@@ -91,6 +91,10 @@ const exportExcel = () => {
   writeFile(workBook, "医生列表.xlsx");
 };
 
+//将特长分开
+const splitTags = (tags: string) => {
+  return tags.split(/,|，/);
+};
 const requestDoctoreAdd = () => {
   doctoreAddVisible.value = true;
 };
@@ -109,7 +113,9 @@ const requestDoctoreAdd = () => {
         <el-table-column prop="desc" label="医生简介" width="120" />
         <el-table-column prop="tags" label="医生特长" width="120">
           <template #default="{ row }">
-            <el-tag type="success">{{ row.tags }}</el-tag>
+            <el-tag v-for="i in splitTags(row.tags)" :key="i" type="success">{{
+              i
+            }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="content" label="医生描述" width="160" />
