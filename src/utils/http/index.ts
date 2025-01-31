@@ -99,7 +99,6 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
-                  console.log(formatToken(data.accessToken));
                   config.headers["token"] = formatToken(data.accessToken);
                   resolve(config);
                 }

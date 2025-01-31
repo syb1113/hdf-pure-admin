@@ -63,9 +63,9 @@ const tableData = ref<Array<TableData>>([]);
 const getData = async () => {
   await requestDoctoresList().then((res: any) => {
     const { data, success, errorMessage } = res;
-    console.log(data);
     if (success) {
       tableData.value = data.list;
+      console.log(tableData.value);
     } else {
       message("获取失败", { type: "error" });
     }
@@ -124,7 +124,7 @@ const requestDoctoreAdd = () => {
             <el-avatar
               shape="square"
               :size="50"
-              :src="row.avatar ? row.avatar : doctorAvatar"
+              :src="row.avatar ? VITE_BASE_URL + row.avatar : doctorAvatar"
             />
           </template>
         </el-table-column>
@@ -168,5 +168,5 @@ const requestDoctoreAdd = () => {
     </div>
   </el-card>
 
-  <doctoreAddDialog v-model="doctoreAddVisible" />
+  <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
 </template>

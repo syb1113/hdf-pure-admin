@@ -31,3 +31,10 @@ export const requestHospitalIdList = () => {
     params
   });
 };
+
+/**添加医生 */
+export const requestDoctoresAdd = (data: object) => {
+  return http.request<requestResult>("post", baseUrlAdmin("doctors"), {
+    data
+  });
+};
