@@ -9,7 +9,6 @@ type Result = {
 export const mapJson = (params?: object) => {
   return http.request<Result>("get", "/get-map-info", { params });
 };
-
 /** 文件上传 */
 export const formUpload = data => {
   return http.request<Result>(

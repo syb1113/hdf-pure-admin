@@ -15,8 +15,16 @@ export default {
       name: "doctorList",
       component: () => import("@/views/doctorManagement/doctorList.vue"),
       meta: {
-        title: $t("menus.pureDoctorList"),
-        showParent: true
+        title: $t("menus.pureDoctorList")
+      }
+    },
+    {
+      path: "/doctorManagement/doctorDetali",
+      name: "doctorDetali",
+      component: () => import("@/views/doctorManagement/doctorDetali.vue"),
+      meta: {
+        title: $t("menus.pureDoctorDetail")
+        // showLink: false
       }
     }
   ]

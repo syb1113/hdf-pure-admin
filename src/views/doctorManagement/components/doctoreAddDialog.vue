@@ -129,7 +129,7 @@
           </el-upload>
 
           <el-dialog v-model="dialogVisible">
-            <img w-full :src="dialogImageUrl" alt="Preview Image" />
+            <img :src="dialogImageUrl" alt="Preview Image" />
           </el-dialog>
         </el-form-item>
       </el-form>
@@ -219,6 +219,7 @@ const getDoctorTitleIdList = () => {
     const { data, success } = res;
     if (success) {
       DoctorTitleIdList.value = data.list;
+      console.log(DoctorTitleIdList.value);
     }
   });
 };
@@ -324,6 +325,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       });
       doctoreAddVisible.value = false;
       resetFrom();
+      fileList.value.length = 0;
     } else {
       console.log("error submit!", fields);
     }
@@ -334,6 +336,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   doctoreAddVisible.value = false;
   resetFrom();
+  fileList.value.length = 0;
   formEl.resetFields();
 };
 </script>

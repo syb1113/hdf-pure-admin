@@ -65,6 +65,7 @@ menus:
   pureHome: 首页
   pureDoctor: 医生管理
   pureDoctorList: 医生列表
+  pureDoctorDetail: 医生详情
   pureDoctorAdd: 添加医生
   pureLogin: 登录
   pureEmpty: 无Layout页

@@ -4,19 +4,25 @@ import { utils, writeFile } from "xlsx";
 import { requestDoctoresList } from "@/api/doctorManagement";
 import { message } from "@/utils/message";
 import doctoreAddDialog from "./components/doctoreAddDialog.vue";
+import doctoreDetailDialog from "./components/doctoreDetailDialog.vue";
 import { Plus } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 
+import {
+  requestDoctorDetails,
+  requestDoctorDelete
+} from "@/api/doctorManagement";
 const { VITE_BASE_URL } = import.meta.env;
 defineOptions({
   name: "doctorList"
 });
 
 interface SpecificInfor {
-  id: string;
+  id?: string;
   name: string;
-  desc: string; //详情
-  image: string;
-  content: string; //描述
+  desc?: string; //详情
+  image?: string;
+  content?: string; //描述
   [propName: string]: string;
 }
 
@@ -37,13 +43,60 @@ interface TableData {
   hospitalInfo: SpecificInfor; //医院信息
   [propName: string]: string | number | SpecificInfor;
 }
+
+interface RuleForm {
+  id: string;
+  name: string;
+  desc: string;
+  tags: string;
+  content: string;
+  doctorTitleId: string; //职称id
+  departmentId: string; //科室id
+  hospitalId: string; //医院id
+  avatar: string;
+}
 onMounted(() => {
   getData();
 });
 
 const doctoreAddVisible = ref<boolean>(false);
-const handleClick = () => {
-  console.log("click");
+const doctoreDetailVisible = ref<boolean>(false);
+const disabled = ref<boolean>(true);
+const doctorDetails = ref<RuleForm>();
+// 详情
+const handleClick = async (row: TableData) => {
+  getDoctorDetails(row);
+  doctoreDetailVisible.value = true;
+  disabled.value = true;
+};
+
+// 修改
+const updataDoctor = (row: TableData) => {
+  getDoctorDetails(row);
+  doctoreDetailVisible.value = true;
+  disabled.value = false;
+};
+
+const delDoctor = async (row: TableData) => {
+  await requestDoctorDelete(row.id).then((res: any) => {
+    const { success, errorMessage } = res;
+    if (success) {
+      ElMessage.success("删除成功");
+      getData();
+    } else {
+      ElMessage.error(errorMessage);
+    }
+  });
+};
+
+const getDoctorDetails = async (row: TableData) => {
+  await requestDoctorDetails(row.id).then((res: any) => {
+    const { data, success } = res;
+    console.log("res", res);
+    if (success) {
+      doctorDetails.value = data;
+    }
+  });
 };
 const doctorAvatar =
   VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg";
@@ -51,7 +104,7 @@ const columns = [
   { title: "医生名字", dataKey: "name" },
   { title: "医生简介", dataKey: "desc" },
   { title: "医生特长", dataKey: "tags" },
-  { title: "医生简介", dataKey: "desc" },
+  { title: "医生描述", dataKey: "content" },
   { title: "医生部门", dataKey: item => item.departmentInfo?.name },
   { title: "医生职位", dataKey: item => item.doctorTitleInfo?.name },
   { title: "所属医院", dataKey: item => item.hospitalInfo?.name },
@@ -60,16 +113,33 @@ const columns = [
 ];
 
 const tableData = ref<Array<TableData>>([]);
+const pages = ref({
+  per: 9, //每页显示的数量
+  page: 1 //页码
+});
+const currentPage = ref<number>(1);
+const total = ref<number>(0);
+
 const getData = async () => {
-  await requestDoctoresList().then((res: any) => {
+  await requestDoctoresList(pages.value).then((res: any) => {
     const { data, success, errorMessage } = res;
     if (success) {
       tableData.value = data.list;
       console.log(tableData.value);
+      total.value = data.total;
     } else {
       message("获取失败", { type: "error" });
     }
   });
+};
+
+const handleSizeChange = (val: number) => {
+  pages.value.per = val;
+  getData();
+};
+const handleCurrentChange = (val: number) => {
+  pages.value.page = val;
+  getData();
 };
 const exportExcel = () => {
   const res = tableData.value.map(item => {
@@ -101,72 +171,110 @@ const requestDoctoreAdd = () => {
 </script>
 
 <template>
-  <el-card shadow="never">
-    <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
-      >添加医生</el-button
-    >
-    <el-button type="primary" @click="exportExcel">导出Excel</el-button>
-    <div class="h-[25rem] mt-3">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column fixed="left" type="index" label="#" width="100" />
-        <el-table-column prop="name" label="医生名字" width="120" />
-        <el-table-column prop="desc" label="医生简介" width="120" />
-        <el-table-column prop="tags" label="医生特长" width="120">
-          <template #default="{ row }">
-            <el-tag v-for="i in splitTags(row.tags)" :key="i" type="success">{{
-              i
-            }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="content" label="医生描述" width="160" />
-        <el-table-column prop="avatar" label="证件照" width="120">
-          <template #default="{ row }">
-            <el-avatar
-              shape="square"
-              :size="50"
-              :src="row.avatar ? VITE_BASE_URL + row.avatar : doctorAvatar"
-            />
-          </template>
-        </el-table-column>
-        <el-table-column prop="departmentInfoName" label="所属部门" width="120">
-          <template #default="{ row }">
-            <el-text class="mx-1">{{ row.departmentInfo.name }}</el-text>
-          </template> </el-table-column
-        ><el-table-column
-          prop="doctorTitleInfoName"
-          label="医生职位"
-          width="120"
-        >
-          <template #default="{ row }">
-            <el-text class="mx-1">{{ row.doctorTitleInfo.name }}</el-text>
-          </template> </el-table-column
-        ><el-table-column prop="hospitalInfoName" label="所属医院" width="120">
-          <template #default="{ row }">
-            <el-text class="mx-1">{{ row.hospitalInfo.name }}</el-text>
-          </template>
-        </el-table-column>
-        <el-table-column prop="phone" label="医院电话" width="120">
-          <template #default="{ row }">
-            <el-text class="mx-1">{{ row.hospitalInfo.phone }}</el-text>
-          </template>
-        </el-table-column>
-        <el-table-column prop="address" label="医院地址" width="120">
-          <template #default="{ row }">
-            <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
-          </template>
-        </el-table-column>
-        <el-table-column fixed="right" label="操作" width="200">
-          <template #default>
-            <el-button type="primary" size="small" @click="handleClick"
-              >详情</el-button
-            >
-            <el-button size="small">修改</el-button>
-            <el-button type="danger" size="small">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-  </el-card>
+  <div class="root">
+    <el-card shadow="never">
+      <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
+        >添加医生</el-button
+      >
+      <el-button type="primary" @click="exportExcel">导出Excel</el-button>
+      <div class="mt-3">
+        <el-table :data="tableData" style="width: 100%">
+          <el-table-column fixed="left" type="index" label="#" width="100" />
+          <el-table-column prop="name" label="医生名字" width="120" />
+          <el-table-column prop="desc" label="医生简介" min-width="200" />
+          <el-table-column prop="tags" label="医生特长" width="120">
+            <template #default="{ row }">
+              <el-tag
+                v-for="i in splitTags(row.tags)"
+                :key="i"
+                type="success"
+                >{{ i }}</el-tag
+              >
+            </template>
+          </el-table-column>
+          <el-table-column prop="content" label="医生描述" width="160" />
+          <el-table-column prop="avatar" label="证件照" width="120">
+            <template #default="{ row }">
+              <el-avatar
+                shape="square"
+                :size="50"
+                :src="row.avatar ? VITE_BASE_URL + row.avatar : doctorAvatar"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="departmentInfoName"
+            label="所属部门"
+            width="120"
+          >
+            <template #default="{ row }">
+              <el-text class="mx-1">{{ row.departmentInfo.name }}</el-text>
+            </template> </el-table-column
+          ><el-table-column
+            prop="doctorTitleInfoName"
+            label="医生职位"
+            width="120"
+          >
+            <template #default="{ row }">
+              <el-text class="mx-1">{{ row.doctorTitleInfo.name }}</el-text>
+            </template> </el-table-column
+          ><el-table-column
+            prop="hospitalInfoName"
+            label="所属医院"
+            min-width="200"
+          >
+            <template #default="{ row }">
+              <el-text class="mx-1">{{ row.hospitalInfo.name }}</el-text>
+            </template>
+          </el-table-column>
+          <el-table-column prop="phone" label="医院电话" width="120">
+            <template #default="{ row }">
+              <el-text class="mx-1">{{ row.hospitalInfo.phone }}</el-text>
+            </template>
+          </el-table-column>
+          <el-table-column prop="address" label="医院地址" min-width="200">
+            <template #default="{ row }">
+              <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
+            </template>
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" width="200">
+            <template #default="{ row }">
+              <el-button type="primary" size="small" @click="handleClick(row)"
+                >详情</el-button
+              >
+              <el-button size="small" @click="updataDoctor(row)"
+                >修改</el-button
+              >
+              <el-button type="danger" size="small" @click="delDoctor(row)"
+                >删除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="flex justify-end mt-3">
+        <el-pagination
+          v-model:current-page="currentPage"
+          :page-size="pages.per"
+          layout="total, prev, pager, next"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </el-card>
 
-  <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
+    <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
+    <doctoreDetailDialog
+      v-model="doctoreDetailVisible"
+      :doctorDetails="doctorDetails"
+      :disabled="disabled"
+      @getData="getData"
+    />
+  </div>
 </template>
+<style lang="scss" scoped>
+.root {
+  margin: 10px;
+}
+</style>
