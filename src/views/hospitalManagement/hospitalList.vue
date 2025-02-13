@@ -1,65 +1,42 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { utils, writeFile } from "xlsx";
-import { requestDoctoresList } from "@/api/doctorManagement";
+import { requestHospitalList } from "@/api/hospitalManagement";
 import { message } from "@/utils/message";
-import doctoreAddDialog from "./components/doctoreAddDialog.vue";
-import doctoreDetailDialog from "./components/doctoreDetailDialog.vue";
 import { Plus } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-
+import hospitalAddDialog from "./components/hospitalAddDialog.vue";
 import {
   requestDoctorDetails,
   requestDoctorDelete
 } from "@/api/doctorManagement";
 const { VITE_BASE_URL } = import.meta.env;
-defineOptions({
-  name: "doctorList"
-});
-
-interface SpecificInfor {
-  id?: string;
-  name: string;
-  desc?: string; //详情
-  image?: string;
-  content?: string; //描述
-  [propName: string]: string;
-}
-
 interface TableData {
   id: string;
   name: string;
   desc: string;
-  tags: string;
   content: string;
-  avatar: string;
+  image: string;
+  address: string;
+  phone: string;
   createdAt: string;
   updatedAt: string;
-  departmentId: string; //部门id
-  doctorTitleId: string; //职称id
-  hospitalId: string; //医院id
-  doctorTitleInfo: SpecificInfor; //职位
-  departmentInfo: SpecificInfor; //部门
-  hospitalInfo: SpecificInfor; //医院信息
-  [propName: string]: string | number | SpecificInfor;
 }
 
 interface RuleForm {
   id: string;
   name: string;
   desc: string;
-  tags: string;
   content: string;
-  doctorTitleId: string; //职称id
-  departmentId: string; //科室id
-  hospitalId: string; //医院id
-  avatar: string;
+  image: string;
+  address: string;
+  phone: string;
 }
 onMounted(() => {
   getData();
 });
 
-const doctoreAddVisible = ref<boolean>(false);
+const hospitalAddVisible = ref<boolean>(false);
 const doctoreDetailVisible = ref<boolean>(false);
 const disabled = ref<boolean>(true);
 const doctorDetails = ref<RuleForm>();
@@ -101,15 +78,11 @@ const getDoctorDetails = async (row: TableData) => {
 const doctorAvatar =
   VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg";
 const columns = [
-  { title: "医生名字", dataKey: "name" },
-  { title: "医生简介", dataKey: "desc" },
-  { title: "医生特长", dataKey: "tags" },
-  { title: "医生描述", dataKey: "content" },
-  { title: "医生部门", dataKey: item => item.departmentInfo?.name },
-  { title: "医生职位", dataKey: item => item.doctorTitleInfo?.name },
-  { title: "所属医院", dataKey: item => item.hospitalInfo?.name },
-  { title: "医院电话", dataKey: item => item.hospitalInfo?.phone },
-  { title: "医院地址", dataKey: item => item.hospitalInfo?.address }
+  { title: "医院名称", dataKey: "name" },
+  { title: "医院简介", dataKey: "desc" },
+  { title: "医院详情", dataKey: "content" },
+  { title: "医院地址", dataKey: "address" },
+  { title: "医院电话", dataKey: "phone" }
 ];
 
 const tableData = ref<Array<TableData>>([]);
@@ -121,8 +94,9 @@ const currentPage = ref<number>(1);
 const total = ref<number>(0);
 
 const getData = async () => {
-  await requestDoctoresList(pages.value).then((res: any) => {
+  await requestHospitalList(pages.value).then((res: any) => {
     const { data, success, errorMessage } = res;
+    console.log(data);
     if (success) {
       tableData.value = data.list;
       console.log(tableData.value);
@@ -144,16 +118,12 @@ const handleCurrentChange = (val: number) => {
 const exportExcel = () => {
   const res = tableData.value.map(item => {
     return columns.map(column => {
-      if (typeof column.dataKey === "function") {
-        return column.dataKey(item);
-      }
       return item[column.dataKey];
     });
   });
 
   const titleList = columns.map(column => column.title);
   res.unshift(titleList);
-
   const workSheet = utils.aoa_to_sheet(res);
   // 计算列宽
   const colWidths = columns.map((_, colIndex) => {
@@ -172,85 +142,38 @@ const exportExcel = () => {
   const workBook = utils.book_new();
 
   utils.book_append_sheet(workBook, workSheet, "数据报表");
-  writeFile(workBook, "医生列表.xlsx");
+  writeFile(workBook, "医院列表.xlsx");
 };
 
-//将特长分开
-const splitTags = (tags: string) => {
-  return tags.split(/,|，/);
-};
-const requestDoctoreAdd = () => {
-  doctoreAddVisible.value = true;
+const requestHospitalAdd = () => {
+  hospitalAddVisible.value = true;
 };
 </script>
 
 <template>
   <div class="root">
     <el-card shadow="always">
-      <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
-        >添加医生</el-button
+      <el-button :icon="Plus" type="primary" @click="requestHospitalAdd"
+        >新增医院</el-button
       >
       <el-button type="primary" @click="exportExcel">导出Excel</el-button>
       <div class="mt-3">
         <el-table :data="tableData" style="width: 100%">
           <el-table-column fixed="left" type="index" label="#" width="100" />
-          <el-table-column prop="name" label="医生名字" width="120" />
-          <el-table-column prop="desc" label="医生简介" min-width="200" />
-          <el-table-column prop="tags" label="医生特长" width="120">
-            <template #default="{ row }">
-              <el-tag
-                v-for="i in splitTags(row.tags)"
-                :key="i"
-                type="success"
-                >{{ i }}</el-tag
-              >
-            </template>
-          </el-table-column>
-          <el-table-column prop="content" label="医生描述" width="160" />
-          <el-table-column prop="avatar" label="证件照" width="120">
+          <el-table-column prop="name" label="医院名称" />
+          <el-table-column prop="desc" label="医院简介" min-width="200" />
+          <el-table-column prop="content" label="医院详情" width="160" />
+          <el-table-column prop="image" label="医院照片" width="120">
             <template #default="{ row }">
               <el-avatar
                 shape="square"
                 :size="50"
-                :src="row.avatar ? VITE_BASE_URL + row.avatar : doctorAvatar"
+                :src="row.image ? VITE_BASE_URL + row.avatar : doctorAvatar"
               />
             </template>
           </el-table-column>
-          <el-table-column
-            prop="departmentInfoName"
-            label="所属部门"
-            width="120"
-          >
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.departmentInfo.name }}</el-text>
-            </template> </el-table-column
-          ><el-table-column
-            prop="doctorTitleInfoName"
-            label="医生职位"
-            width="120"
-          >
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.doctorTitleInfo.name }}</el-text>
-            </template> </el-table-column
-          ><el-table-column
-            prop="hospitalInfoName"
-            label="所属医院"
-            min-width="200"
-          >
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.hospitalInfo.name }}</el-text>
-            </template>
-          </el-table-column>
-          <el-table-column prop="phone" label="医院电话" width="120">
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.hospitalInfo.phone }}</el-text>
-            </template>
-          </el-table-column>
-          <el-table-column prop="address" label="医院地址" min-width="200">
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
-            </template>
-          </el-table-column>
+          <el-table-column prop="phone" label="医院电话" width="120" />
+          <el-table-column prop="address" label="医院地址" min-width="200" />
           <el-table-column fixed="right" label="操作" width="200">
             <template #default="{ row }">
               <el-button type="primary" size="small" @click="handleClick(row)"
@@ -277,18 +200,13 @@ const requestDoctoreAdd = () => {
         />
       </div>
     </el-card>
-
-    <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
-    <doctoreDetailDialog
-      v-model="doctoreDetailVisible"
-      :doctorDetails="doctorDetails"
-      :disabled="disabled"
-      @getData="getData"
-    />
   </div>
+
+  <hospitalAddDialog v-model="hospitalAddVisible" @getData="getData" />
 </template>
+
 <style lang="scss" scoped>
 .root {
-  margin: 10px;
+  margin: 20px;
 }
 </style>

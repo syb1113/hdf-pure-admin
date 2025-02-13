@@ -123,6 +123,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from "vue";
+// import { delObjectProperty } from "@pureadmin/utils";
 import {
   requestDoctorTitleIdList,
   requestDepartmentIdList,
@@ -208,6 +209,7 @@ const updataDoctor = async () => {
     }
     data[key] = form.value[key];
   }
+  // const data = delObjectProperty(form.value, ["id", "createdAt", "updatedAt"]);
   await requestDoctorModify(form.value.id, data).then((res: any) => {
     const { success } = res;
     if (success) {

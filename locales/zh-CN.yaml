@@ -66,6 +66,8 @@ menus:
   pureDoctor: 医生管理
   pureDoctorList: 医生列表
   pureDoctorDetail: 医生详情
+  pureHospital: 医院管理
+  pureHospitalList: 医院列表
   pureDoctorAdd: 添加医生
   pureLogin: 登录
   pureEmpty: 无Layout页
@@ -121,14 +123,6 @@ menus:
   pureProgress: 进度条
   pureUpload: 文件上传
   pureCheckCard: 多选卡片
-  pureMenus: 多级菜单
-  pureMenu1: 菜单1
-  pureMenu1-1: 菜单1-1
-  pureMenu1-2: 菜单1-2
-  pureMenu1-2-1: 菜单1-2-1
-  pureMenu1-2-2: 菜单1-2-2
-  pureMenu1-3: 菜单1-3
-  pureMenu2: 菜单二
   purePermission: 权限管理
   purePermissionPage: 页面权限
   purePermissionButton: 按钮权限
