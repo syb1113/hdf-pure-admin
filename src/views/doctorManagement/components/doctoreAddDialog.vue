@@ -323,7 +323,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           ElMessage.error(errorMessage);
         }
       });
+      doctoreAddVisible.value = false;
       resetFrom();
+      fileList.value.length = 0;
     } else {
       console.log("error submit!", fields);
     }

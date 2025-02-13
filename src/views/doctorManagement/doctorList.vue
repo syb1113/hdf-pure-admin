@@ -64,7 +64,7 @@ const doctoreDetailVisible = ref<boolean>(false);
 const disabled = ref<boolean>(true);
 const doctorDetails = ref<RuleForm>();
 // 详情
-const handleClick = async (row: TableData) => {
+const handleClick = (row: TableData) => {
   getDoctorDetails(row);
   doctoreDetailVisible.value = true;
   disabled.value = true;
@@ -276,15 +276,14 @@ const requestDoctoreAdd = () => {
           @current-change="handleCurrentChange"
         />
       </div>
+      <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
+      <doctoreDetailDialog
+        v-model="doctoreDetailVisible"
+        :doctorDetails="doctorDetails"
+        :disabled="disabled"
+        @getData="getData"
+      />
     </el-card>
-
-    <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
-    <doctoreDetailDialog
-      v-model="doctoreDetailVisible"
-      :doctorDetails="doctorDetails"
-      :disabled="disabled"
-      @getData="getData"
-    />
   </div>
 </template>
 <style lang="scss" scoped>

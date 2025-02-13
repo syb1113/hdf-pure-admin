@@ -131,33 +131,6 @@ import {
   requestDoctorModify
 } from "@/api/doctorManagement";
 
-interface SpecificInfor {
-  id?: string;
-  name: string;
-  desc?: string; //详情
-  image?: string;
-  content?: string; //描述
-  [propName: string]: string;
-}
-
-interface DoctorData {
-  id: string;
-  name: string;
-  desc: string;
-  tags: string;
-  content: string;
-  avatar: string;
-  createdAt: string;
-  updatedAt: string;
-  departmentId: string; //部门id
-  doctorTitleId: string; //职称id
-  hospitalId: string; //医院id
-  doctorTitleInfo: SpecificInfor; //职位
-  departmentInfo: SpecificInfor; //部门
-  hospitalInfo: SpecificInfor; //医院信息
-  [propName: string]: string | number | SpecificInfor;
-}
-
 interface RuleForm {
   id: string;
   name: string;

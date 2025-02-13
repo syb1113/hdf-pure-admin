@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, provide, inject } from "vue";
 import { utils, writeFile } from "xlsx";
-import { requestHospitalList } from "@/api/hospitalManagement";
+import {
+  requestHospitalList,
+  requestHostpitalDetails
+} from "@/api/hospitalManagement";
 import { message } from "@/utils/message";
 import { Plus } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
@@ -10,6 +13,9 @@ import {
   requestDoctorDetails,
   requestDoctorDelete
 } from "@/api/doctorManagement";
+import hospitalDetailsDialog from "./components/hospitalDetailsDialog.vue";
+import { useAddressStore } from "@/store/addressStrStore";
+
 const { VITE_BASE_URL } = import.meta.env;
 interface TableData {
   id: string;
@@ -23,34 +29,38 @@ interface TableData {
   updatedAt: string;
 }
 
-interface RuleForm {
-  id: string;
+interface HostipalData {
+  readonly id: string;
   name: string;
   desc: string;
-  content: string;
   image: string;
+  content: string;
   address: string;
   phone: string;
 }
+
 onMounted(() => {
   getData();
 });
 
 const hospitalAddVisible = ref<boolean>(false);
-const doctoreDetailVisible = ref<boolean>(false);
+const hospitalDetailVisible = ref<boolean>(false);
 const disabled = ref<boolean>(true);
-const doctorDetails = ref<RuleForm>();
+const hospitalData = ref<HostipalData>();
 // 详情
-const handleClick = async (row: TableData) => {
-  getDoctorDetails(row);
-  doctoreDetailVisible.value = true;
+const detailRef = ref(null);
+const addressStore = useAddressStore();
+const handleClick = (row: TableData) => {
+  addressStore.setAddress(row.address);
+  getHostpitalDetails(row);
+  hospitalDetailVisible.value = true;
   disabled.value = true;
 };
 
 // 修改
 const updataDoctor = (row: TableData) => {
-  getDoctorDetails(row);
-  doctoreDetailVisible.value = true;
+  getHostpitalDetails(row);
+  hospitalDetailVisible.value = true;
   disabled.value = false;
 };
 
@@ -66,12 +76,11 @@ const delDoctor = async (row: TableData) => {
   });
 };
 
-const getDoctorDetails = async (row: TableData) => {
-  await requestDoctorDetails(row.id).then((res: any) => {
+const getHostpitalDetails = async (row: TableData) => {
+  await requestHostpitalDetails(row.id).then((res: any) => {
     const { data, success } = res;
-    console.log("res", res);
     if (success) {
-      doctorDetails.value = data;
+      hospitalData.value = data;
     }
   });
 };
@@ -96,10 +105,10 @@ const total = ref<number>(0);
 const getData = async () => {
   await requestHospitalList(pages.value).then((res: any) => {
     const { data, success, errorMessage } = res;
-    console.log(data);
+    // console.log(data);
     if (success) {
       tableData.value = data.list;
-      console.log(tableData.value);
+      // console.log(tableData.value);
       total.value = data.total;
     } else {
       message("获取失败", { type: "error" });
@@ -199,10 +208,15 @@ const requestHospitalAdd = () => {
           @current-change="handleCurrentChange"
         />
       </div>
+      <hospitalAddDialog v-model="hospitalAddVisible" @getData="getData" />
     </el-card>
+    <hospitalDetailsDialog
+      ref="detailRef"
+      v-model="hospitalDetailVisible"
+      :hospitalData="hospitalData"
+      :disabled="disabled"
+    />
   </div>
-
-  <hospitalAddDialog v-model="hospitalAddVisible" @getData="getData" />
 </template>
 
 <style lang="scss" scoped>

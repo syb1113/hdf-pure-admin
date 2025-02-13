@@ -2,7 +2,7 @@
 // 平台规定只有 home 路由的 rank 才能为 0 ，所以后端在返回 rank 的时候需要从非 0 开始
 const home = 0,
   doctor = 1,
-  hospitalList = 2,
+  hospital = 2,
   able = 4,
   form = 6,
   list = 7,
@@ -10,4 +10,4 @@ const home = 0,
   error = 9,
   nested = 11;
 
-export { home, doctor, hospitalList, able, form, list, result, error, nested };
+export { home, doctor, hospital, able, form, list, result, error, nested };

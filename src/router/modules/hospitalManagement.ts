@@ -1,5 +1,5 @@
 import { $t } from "@/plugins/i18n";
-import { hospitalList } from "@/router/enums";
+import { hospital } from "@/router/enums";
 
 export default {
   path: "/hospitalManagement",
@@ -7,7 +7,7 @@ export default {
   meta: {
     icon: "ic:baseline-location-city",
     title: $t("menus.pureHospital"),
-    rank: hospitalList
+    rank: hospital
   },
   children: [
     {
@@ -15,8 +15,16 @@ export default {
       name: "hospitalList",
       component: () => import("@/views/hospitalManagement/hospitalList.vue"),
       meta: {
-        title: $t("menus.pureHospitalList"),
-        showParent: true
+        title: $t("menus.pureHospitalList")
+      }
+    },
+    {
+      path: "/hospitalManagement/departmentsAndOther",
+      name: "departmentsAndOther",
+      component: () =>
+        import("@/views/hospitalManagement/departmentsAndOther.vue"),
+      meta: {
+        title: $t("menus.pureDepartmentsAndOther")
       }
     }
   ]
