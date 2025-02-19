@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       v-model="hospitalDetailVisible"
-      title="添加医生"
+      title="医院详情"
       width="600"
       :show-close="false"
     >
@@ -32,7 +32,7 @@
           <el-input
             v-model="form.desc"
             clearable
-            placeholder="请输入医院简介"
+            :placeholder="form.desc ? form.desc : ''"
             :disabled="disabled"
           />
         </el-form-item>
@@ -44,7 +44,7 @@
           <el-input
             v-model="form.content"
             clearable
-            placeholder="请输入医院详情介绍"
+            :placeholder="form.content ? form.content : ''"
             :disabled="disabled"
           />
         </el-form-item>
@@ -54,24 +54,11 @@
           prop="address"
         >
           <area-selected
-            ref="areaSelectedRef"
             gap="10"
             width="135"
             :disabled="disabled"
+            :addressStr="form.address"
             @get-address="handleGetAdress"
-            @get-address-info="handleGetAdressInfo"
-          />
-        </el-form-item> -->
-        <!-- <el-form-item
-          label="详细地址"
-          :label-width="formLabelWidth"
-          prop="addressInfo"
-        >
-          <el-input
-            v-model="form.addressInfo"
-            clearable
-            placeholder="请输入详细地址"
-            :disabled="disabled"
           />
         </el-form-item> -->
         <el-form-item
@@ -82,10 +69,22 @@
           <el-input
             v-model="form.address"
             clearable
-            placeholder="请输入医院详细地址"
+            placeholder="请输入详细医院地址"
             :disabled="disabled"
           />
         </el-form-item>
+        <!-- <el-form-item
+          label="医院地址"
+          :label-width="formLabelWidth"
+          prop="address"
+        >
+          <el-input
+            v-model="form.address"
+            clearable
+            placeholder="请输入医院详细地址"
+            :disabled="disabled"
+          />
+        </el-form-item> -->
         <el-form-item
           label="医院电话"
           :label-width="formLabelWidth"
@@ -98,7 +97,7 @@
             :disabled="disabled"
           />
         </el-form-item>
-        <el-form-item
+        <!-- <el-form-item
           label="医院图像上传"
           :label-width="formLabelWidth"
           prop="image"
@@ -116,7 +115,7 @@
           <el-dialog v-model="dialogVisible">
             <img :src="dialogImageUrl" alt="Preview Image" />
           </el-dialog>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -136,7 +135,7 @@ import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import type { ComponentSize, FormInstance, FormRules } from "element-plus";
-import { requestAddHospital } from "@/api/hospitalManagement";
+import { requestEditHospital } from "@/api/hospitalManagement";
 import areaSelected from "./areaSelected.vue";
 import { log } from "console";
 
@@ -148,7 +147,7 @@ interface RuleForm {
   content: string;
   phone: string;
   address: string;
-  addressInfo: string;
+  addressInfo?: string;
 }
 
 interface HostipalData {
@@ -161,7 +160,6 @@ interface HostipalData {
   phone: string;
 }
 
-const areaSelectedRef = ref(null);
 const hospitalDetailVisible = defineModel<boolean>();
 const formLabelWidth = "140px";
 const uploadAction = VITE_BASE_URL + "/common/upload";
@@ -179,7 +177,6 @@ const props = defineProps<{
 const dialogImageUrl = ref("");
 const dialogVisible = ref(false);
 const form = ref<RuleForm>({
-  addressInfo: "",
   ...props.hospitalData
 });
 
@@ -188,10 +185,10 @@ const handleGetAdress = (data: any) => {
   form.value.address = data;
 };
 // 接受详细地址
-const handleGetAdressInfo = (data: any) => {
-  console.log(data);
-  form.value.addressInfo = data.addressInfo;
-};
+// const handleGetAdressInfo = (data: any) => {
+//   console.log(data);
+//   form.value.addressInfo = data.addressInfo;
+// };
 
 const handlePictureCardPreview: UploadProps["onPreview"] = uploadFile => {
   dialogImageUrl.value = uploadFile.url!;
@@ -208,13 +205,25 @@ const handleUploadSuccess: UploadProps["onSuccess"] = (response, file) => {
     ElMessage.error("上传失败");
   }
 };
+
+// // 根据传递的地址字符串进行解析
+// const parseAddress = (addressStr: string) => {
+//   console.log(addressStr);
+//   const regex =
+//     /(.{2,3}[省|自治区|市])(.{2,3}[市|市辖区])(.{2,3}[区|县|市]?)(.*)/;
+//   const match = addressStr.match(regex);
+
+//   if (match) {
+//     form.value.addressInfo = match[4] || "";
+//   }
+// };
 watch(
   () => props.hospitalData,
-  newVal => {
-    form.value = { addressInfo: "", ...newVal };
-    console.log("newVal", newVal);
+  (newVal: HostipalData) => {
+    form.value = { ...newVal };
+    // parseAddress(form.value.address);
   },
-  { deep: true, immediate: true }
+  { deep: true }
 );
 const resetFrom = () => {
   form.value = {
@@ -287,21 +296,36 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      form.value.address =
-        (form.value.address as any).name.join("") + form.value.addressInfo;
-      const { addressInfo, ...data } = form.value;
-      console.log(data);
-      requestAddHospital(data).then((res: any) => {
-        const { success, errorMessage } = res;
-        console.log(res);
-        if (success) {
-          ElMessage.success("添加成功");
-          emit("getData");
-          resetForm(formEl);
-        } else {
-          ElMessage.error(errorMessage);
-        }
-      });
+      // if (typeof form.value.address !== "string") {
+      //   form.value.address =
+      //     (form.value.address as any).name.join("") + form.value.addressInfo;
+      // } else {
+      // }
+
+      // const { addressInfo, ...data } = form.value;
+      console.log(form.value);
+      const data = {
+        name: form.value.name,
+        desc: form.value.desc,
+        content: form.value.content,
+        phone: form.value.phone,
+        address: form.value.address
+        // image: form.value.image
+      };
+      if (!props.disabled) {
+        console.log(data);
+        requestEditHospital(form.value.id, data).then((res: any) => {
+          const { success, errorMessage } = res;
+          console.log(res);
+          if (success) {
+            ElMessage.success("修改成功");
+            emit("getData");
+            resetForm(formEl);
+          } else {
+            ElMessage.error(errorMessage);
+          }
+        });
+      }
       hospitalDetailVisible.value = false;
       resetFrom();
       fileList.value.length = 0;

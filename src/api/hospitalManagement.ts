@@ -24,3 +24,15 @@ export const requestAddHospital = (data: object) => {
 export const requestHostpitalDetails = (id: string) => {
   return http.request<requestResult>("get", baseUrlAdmin(`hospitals/${id}`));
 };
+
+/**修改单个医院信息 */
+export const requestEditHospital = (id: string, data: object) => {
+  return http.request<requestResult>("patch", baseUrlAdmin(`hospitals/${id}`), {
+    data
+  });
+};
+
+/**删除某个医院 */
+export const requsestDelHospital = (id: string) => {
+  return http.request<requestResult>("delete", baseUrlAdmin(`hospitals/${id}`));
+};

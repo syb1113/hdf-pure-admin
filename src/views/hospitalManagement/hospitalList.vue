@@ -9,10 +9,7 @@ import { message } from "@/utils/message";
 import { Plus } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import hospitalAddDialog from "./components/hospitalAddDialog.vue";
-import {
-  requestDoctorDetails,
-  requestDoctorDelete
-} from "@/api/doctorManagement";
+import { requsestDelHospital } from "@/api/hospitalManagement";
 import hospitalDetailsDialog from "./components/hospitalDetailsDialog.vue";
 import { useAddressStore } from "@/store/addressStrStore";
 
@@ -49,23 +46,23 @@ const disabled = ref<boolean>(true);
 const hospitalData = ref<HostipalData>();
 // 详情
 const detailRef = ref(null);
-const addressStore = useAddressStore();
+// const addressStore = useAddressStore();
 const handleClick = (row: TableData) => {
-  addressStore.setAddress(row.address);
+  // addressStore.setAddress(row.address);
   getHostpitalDetails(row);
   hospitalDetailVisible.value = true;
   disabled.value = true;
 };
 
 // 修改
-const updataDoctor = (row: TableData) => {
+const updataHospital = (row: TableData) => {
   getHostpitalDetails(row);
   hospitalDetailVisible.value = true;
   disabled.value = false;
 };
 
-const delDoctor = async (row: TableData) => {
-  await requestDoctorDelete(row.id).then((res: any) => {
+const delHospital = async (row: TableData) => {
+  await requsestDelHospital(row.id).then((res: any) => {
     const { success, errorMessage } = res;
     if (success) {
       ElMessage.success("删除成功");
@@ -177,7 +174,7 @@ const requestHospitalAdd = () => {
               <el-avatar
                 shape="square"
                 :size="50"
-                :src="row.image ? VITE_BASE_URL + row.avatar : doctorAvatar"
+                :src="row.image ? VITE_BASE_URL + row.image : doctorAvatar"
               />
             </template>
           </el-table-column>
@@ -188,10 +185,10 @@ const requestHospitalAdd = () => {
               <el-button type="primary" size="small" @click="handleClick(row)"
                 >详情</el-button
               >
-              <el-button size="small" @click="updataDoctor(row)"
+              <el-button size="small" @click="updataHospital(row)"
                 >修改</el-button
               >
-              <el-button type="danger" size="small" @click="delDoctor(row)"
+              <el-button type="danger" size="small" @click="delHospital(row)"
                 >删除</el-button
               >
             </template>
@@ -215,6 +212,7 @@ const requestHospitalAdd = () => {
       v-model="hospitalDetailVisible"
       :hospitalData="hospitalData"
       :disabled="disabled"
+      @getData="getData"
     />
   </div>
 </template>

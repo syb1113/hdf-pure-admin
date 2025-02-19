@@ -45,7 +45,7 @@
             placeholder="请输入医院详情介绍"
           />
         </el-form-item>
-        <el-form-item
+        <!-- <el-form-item
           label="医院地址"
           :label-width="formLabelWidth"
           prop="address"
@@ -56,14 +56,14 @@
             @get-address="handleGetAdress"
             @get-address-info="handleGetAdressInfo"
           />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item
-          label="详细地址"
+          label="医院地址"
           :label-width="formLabelWidth"
-          prop="addressInfo"
+          prop="address"
         >
           <el-input
-            v-model="form.addressInfo"
+            v-model="form.address"
             clearable
             placeholder="请输入详细地址"
           />
@@ -126,8 +126,8 @@ interface RuleForm {
   image: string;
   content: string;
   phone: string;
-  address: null;
-  addressInfo: string;
+  address: string;
+  addressInfo?: string;
 }
 
 const doctoreAddVisible = defineModel<boolean>();
@@ -172,9 +172,9 @@ const form = ref<RuleForm>({
   desc: "",
   content: "",
   phone: "",
-  address: null,
-  image: "",
-  addressInfo: ""
+  address: "",
+  image: ""
+  // addressInfo: ""
 });
 
 const resetFrom = () => {
@@ -184,8 +184,8 @@ const resetFrom = () => {
     image: "",
     content: "",
     phone: "",
-    address: null,
-    addressInfo: ""
+    address: ""
+    // addressInfo: ""
   };
 };
 
@@ -227,14 +227,15 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: "change"
     }
   ],
-  address: [{ required: true, validator: addressValidator, trigger: "change" }],
-  addressInfo: [
-    {
-      required: true,
-      message: "医院详细地址不能为空",
-      trigger: "change"
-    }
-  ],
+  // address: [{ required: true, validator: addressValidator, trigger: "change" }],
+  address: [{ required: true, message: "医院地址不能为空", trigger: "change" }],
+  // addressInfo: [
+  //   {
+  //     required: true,
+  //     message: "医院详细地址不能为空",
+  //     trigger: "change"
+  //   }
+  // ],
   image: [
     {
       required: true,
@@ -248,12 +249,12 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      form.value.address =
-        (form.value.address as { name: string[] }).name.join("") +
-        form.value.addressInfo;
-      const { addressInfo, ...data } = form.value;
-      console.log(data);
-      requestAddHospital(data).then((res: any) => {
+      // form.value.address =
+      //   (form.value.address as { name: string[] }).name.join("") +
+      //   form.value.addressInfo;
+      // const { addressInfo, ...data } = form.value;
+      // console.log(data);
+      requestAddHospital(form.value).then((res: any) => {
         const { success, errorMessage } = res;
         console.log(res);
         if (success) {

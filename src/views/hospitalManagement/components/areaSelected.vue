@@ -55,6 +55,7 @@ const prop = withDefaults(
     gap: string | number; //选择框中间间隙
     width: string | number; //选择框宽度
     disabled?: boolean; //是否禁用
+    addressStr?: string; //传递的地址字符串
   }>(),
   {
     gap: "8",
@@ -73,26 +74,18 @@ const emit = defineEmits<{
       isComplete: boolean; //是否选择完整，方便校验
     }
   ): void;
-  (
-    e: "getAddressInfo",
-    data: {
-      addressInfo: string; //详细地址
-    }
-  ): void;
 }>();
 
 let address = reactive<{
   province: string;
   city: string;
   area: string;
-  extra: string;
 }>({
   province: "",
   city: "",
-  area: "",
-  extra: ""
+  area: ""
 });
-const addressStore = useAddressStore();
+// const addressStore = useAddressStore();
 
 // 根据传递的地址字符串进行解析
 const parseAddress = (addressStr?: string) => {
@@ -104,17 +97,20 @@ const parseAddress = (addressStr?: string) => {
     address.province = match[1];
     address.city = match[2];
     address.area = match[3] || ""; // 如果没有区的情况，默认为空
-    address.extra = match[4] || ""; // 如果没有区的情况，默认为空
   }
-  console.log(address.extra);
-  emit("getAddressInfo", {
-    addressInfo: address.extra
-  });
 };
 
-onMounted(() => {
-  parseAddress(addressStore.addressStr);
-});
+// onMounted(() => {
+//   parseAddress(prop.addressStr);
+// });
+
+watch(
+  () => prop.addressStr,
+  (newVal: string) => {
+    parseAddress(newVal);
+  },
+  { deep: true }
+);
 
 // 切换省份函数
 const handleProvinceSelect = () => {
