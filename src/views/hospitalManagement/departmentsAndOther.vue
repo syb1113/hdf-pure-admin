@@ -1,29 +1,21 @@
 <template>
   <div class="root">
-    <div class="flex">
-      <el-card shadow="always" class="flex-1">
+    <div class="flex gap-3">
+      <el-card
+        v-for="item in components"
+        :key="item.title"
+        shadow="always"
+        class="flex-1"
+      >
         <template #header>
           <div class="card-header">
-            <span>医生职称</span>
+            <span>{{ item.title }}</span>
           </div>
         </template>
-        <departmentsTable title="医生职称" :table-data="Doctortitles" />
-      </el-card>
-      <el-card shadow="always" class="flex-1 ml-3">
-        <template #header>
-          <div class="card-header">
-            <span>医院科室</span>
-          </div>
-        </template>
-        <departmentsTable title="医院科室" :table-data="Departments" />
-      </el-card>
-      <el-card shadow="always" class="flex-1 ml-3">
-        <template #header>
-          <div class="card-header">
-            <span>医生标签</span>
-          </div>
-        </template>
-        <departmentsTable title="医生标签" :table-data="DoctorTags" />
+        <departmentsTable
+          :title="item.title"
+          :table-data="item.componentData"
+        />
       </el-card>
     </div>
   </div>
@@ -45,9 +37,19 @@ interface TableData {
   image?: string;
 }
 
+interface ComponentList {
+  title: string;
+  componentData: TableData[] | any;
+}
+
 const Doctortitles = ref<TableData[]>([]);
 const Departments = ref<TableData[]>([]);
 const DoctorTags = ref<TableData[]>([]);
+const components = ref<ComponentList[]>([
+  { title: "医生职称", componentData: Doctortitles },
+  { title: "医院科室", componentData: Departments },
+  { title: "医生标签", componentData: DoctorTags }
+]);
 
 onMounted(() => {
   getDoctortitles();
