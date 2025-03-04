@@ -320,9 +320,9 @@ watch(loginDay, value => {
               </el-form-item>
             </Motion> -->
           </el-form>
-          <el-dialog v-model="verifyShow" width="350"
+          <el-dialog v-model="verifyShow" width="350" :show-close="false"
             ><Vcode
-              :show="true"
+              :show="verifyShow"
               type="inside"
               @fail="onFail"
               @success="onSuccess"
