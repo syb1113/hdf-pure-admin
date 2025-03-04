@@ -68,6 +68,12 @@ function onSuccess() {
 function onFail() {
   console.log("验证失败");
 }
+
+const vcodeDialog = () => {
+  console.log(1);
+  disabled.value = false;
+  loading.value = false;
+};
 const requesrLogin = () => {
   useUserStoreHook()
     .loginByUsername({
@@ -320,7 +326,7 @@ watch(loginDay, value => {
               </el-form-item>
             </Motion> -->
           </el-form>
-          <el-dialog v-model="verifyShow" width="350" :show-close="false"
+          <el-dialog v-model="verifyShow" width="350" @close="vcodeDialog"
             ><Vcode
               :show="verifyShow"
               type="inside"
