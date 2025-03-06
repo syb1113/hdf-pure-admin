@@ -225,7 +225,4 @@ const requestHospitalAdd = () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.root {
-}
-</style>
+<style lang="scss" scoped></style>

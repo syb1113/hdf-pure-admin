@@ -46,6 +46,7 @@
         @current-change="handleCurrentChange"
       />
     </div>
+    <doctorOtherDialog v-model="doctorOtherDialogVisible" :title="title" />
   </div>
 </template>
 <script setup lang="ts">
@@ -57,6 +58,7 @@ import {
 } from "@/api/hospitalManagement";
 import { message } from "@/utils/message";
 import { ref, onMounted, computed } from "vue";
+import doctorOtherDialog from "../dialog/doctorOtherDialog.vue";
 
 interface TableData {
   id: string;
@@ -85,7 +87,6 @@ const emit = defineEmits<{
 }>();
 const currentPage = ref(1);
 const pageSize = ref(8);
-
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
   emit("updatePage", currentPage.value, pageSize.value);
@@ -110,7 +111,7 @@ const handleRemove = (titel: string, id: string) => {
 };
 
 const handleUpdata = (titel: string, id: string) => {
-  console.log("handleUpdata");
+  doctorOtherDialogVisible.value = true;
 };
 
 const delDocTitle = async (id: string) => {
@@ -148,5 +149,7 @@ const delDocTags = async (id: string) => {
     emit("getData");
   });
 };
+
+const doctorOtherDialogVisible = ref(false);
 </script>
 <style lang="scss" scoped></style>
