@@ -17,15 +17,6 @@ export default {
       meta: {
         title: $t("menus.pureDoctorList")
       }
-    },
-    {
-      path: "/doctorManagement/doctorDetali",
-      name: "doctorDetali",
-      component: () => import("@/views/doctorManagement/doctorDetali.vue"),
-      meta: {
-        title: $t("menus.pureDoctorDetail")
-        // showLink: false
-      }
     }
   ]
 } satisfies RouteConfigsTable;

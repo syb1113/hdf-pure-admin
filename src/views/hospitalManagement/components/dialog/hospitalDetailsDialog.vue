@@ -136,7 +136,7 @@ import { Plus } from "@element-plus/icons-vue";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import { requestEditHospital } from "@/api/hospitalManagement";
-import areaSelected from "./areaSelected.vue";
+import areaSelected from "../areaSelected.vue";
 import { log } from "console";
 
 interface RuleForm {

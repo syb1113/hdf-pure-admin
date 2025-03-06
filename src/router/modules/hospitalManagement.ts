@@ -21,10 +21,26 @@ export default {
     {
       path: "/hospitalManagement/departmentsAndOther",
       name: "departmentsAndOther",
-      component: () =>
-        import("@/views/hospitalManagement/departmentsAndOther.vue"),
+      component: () => import("@/views/hospitalManagement/departmentsList.vue"),
       meta: {
         title: $t("menus.pureDepartmentsAndOther")
+      }
+    },
+    {
+      path: "/hospitalManagement/doctorTitlesList",
+      name: "doctorTitlesList",
+      component: () =>
+        import("@/views/hospitalManagement/doctorTitlesList.vue"),
+      meta: {
+        title: $t("menus.pureDoctorsTitles")
+      }
+    },
+    {
+      path: "/hospitalManagement/doctorTagsList",
+      name: "doctorTagsList",
+      component: () => import("@/views/hospitalManagement/doctorTagsList.vue"),
+      meta: {
+        title: $t("menus.pureDoctorsTags")
       }
     }
   ]

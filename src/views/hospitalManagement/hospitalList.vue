@@ -8,10 +8,10 @@ import {
 import { message } from "@/utils/message";
 import { Plus } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import hospitalAddDialog from "./components/hospitalAddDialog.vue";
+import hospitalAddDialog from "./components/dialog/hospitalAddDialog.vue";
+import hospitalDetailsDialog from "./components/dialog/hospitalDetailsDialog.vue";
 import { requsestDelHospital } from "@/api/hospitalManagement";
-import hospitalDetailsDialog from "./components/hospitalDetailsDialog.vue";
-import { useAddressStore } from "@/store/addressStrStore";
+import SearchBar from "./components/SearchBar/index.vue";
 
 const { VITE_BASE_URL } = import.meta.env;
 interface TableData {
@@ -94,7 +94,8 @@ const columns = [
 const tableData = ref<Array<TableData>>([]);
 const pages = ref({
   per: 9, //每页显示的数量
-  page: 1 //页码
+  page: 1, //页码
+  name: ""
 });
 const currentPage = ref<number>(1);
 const total = ref<number>(0);
@@ -111,6 +112,11 @@ const getData = async () => {
       message("获取失败", { type: "error" });
     }
   });
+};
+
+const searchData = (search: string | any) => {
+  pages.value.name = search;
+  getData();
 };
 
 const handleSizeChange = (val: number) => {
@@ -158,6 +164,8 @@ const requestHospitalAdd = () => {
 
 <template>
   <div class="root">
+    <SearchBar :options-lit="tableData" @search="searchData" />
+
     <el-card shadow="always">
       <el-button :icon="Plus" type="primary" @click="requestHospitalAdd"
         >新增医院</el-button
@@ -219,6 +227,5 @@ const requestHospitalAdd = () => {
 
 <style lang="scss" scoped>
 .root {
-  margin: 20px;
 }
 </style>

@@ -68,7 +68,9 @@ menus:
   pureDoctorDetail: 医生详情
   pureHospital: 医院管理
   pureHospitalList: 医院列表
-  pureDepartmentsAndOther: 科室及其他
+  pureDepartmentsAndOther: 科室列表
+  pureDoctorsTitles: 医生职称
+  pureDoctorsTags: 医生标签
   pureDoctorAdd: 添加医生
   pureLogin: 登录
   pureEmpty: 无Layout页
