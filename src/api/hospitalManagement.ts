@@ -81,3 +81,54 @@ export const requestDocTagsDel = (id: string) => {
     baseUrlAdmin(`doctor_tags/${id}`)
   );
 };
+
+/**单个职称获取 */
+export const requestOneDocTitle = (id: string) => {
+  return http.request<requestResult>(
+    "get",
+    baseUrlAdmin(`doctor_titles/${id}`)
+  );
+};
+
+/**单个科室获取 */
+export const requestOneDocDepartments = (id: string) => {
+  return http.request<requestResult>("get", baseUrlAdmin(`departments/${id}`));
+};
+
+/**单个医生标签获取 */
+export const requestOneDocTags = (id: string) => {
+  return http.request<requestResult>("get", baseUrlAdmin(`doctor_tags/${id}`));
+};
+
+/**修改单个职称*/
+export const requestOneDocTitleUp = (data: object, id: string) => {
+  return http.request<requestResult>(
+    "patch",
+    baseUrlAdmin(`doctor_titles/${id}`),
+    {
+      data
+    }
+  );
+};
+
+/**修改单个科室*/
+export const requestOneDocDepartmentsUp = (data: object, id: string) => {
+  return http.request<requestResult>(
+    "patch",
+    baseUrlAdmin(`departments/${id}`),
+    {
+      data
+    }
+  );
+};
+
+/**修改医生标签 */
+export const requestOneDocTagsUp = (data: object, id: string) => {
+  return http.request<requestResult>(
+    "patch",
+    baseUrlAdmin(`doctor_tags/${id}`),
+    {
+      data
+    }
+  );
+};

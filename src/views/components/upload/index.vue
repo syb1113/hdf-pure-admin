@@ -102,28 +102,6 @@ const onDownload = () => {
 
 <template>
   <el-card shadow="never">
-    <template #header>
-      <div class="card-header">
-        <el-link
-          v-tippy="{
-            content: '点击查看详细文档'
-          }"
-          href="https://element-plus.org/zh-CN/component/upload.html"
-          target="_blank"
-          style="font-size: 16px; font-weight: 800"
-        >
-          文件上传
-        </el-link>
-      </div>
-      <el-link
-        class="mt-2"
-        href="https://github.com/pure-admin/vue-pure-admin/blob/main/src/views/components/upload"
-        target="_blank"
-      >
-        代码位置 src/views/components/upload
-      </el-link>
-    </template>
-
     <el-button class="mb-4" text bg @click="onDownload">
       点击下载安全文件进行上传测试
     </el-button>

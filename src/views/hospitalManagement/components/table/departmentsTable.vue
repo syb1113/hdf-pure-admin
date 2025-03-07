@@ -46,7 +46,11 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <doctorOtherDialog v-model="doctorOtherDialogVisible" :title="title" />
+    <doctorOtherDialog
+      v-model="doctorOtherDialogVisible"
+      :title="title"
+      :docDetails="docDetails"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -54,10 +58,13 @@ import { Edit, Delete } from "@element-plus/icons-vue";
 import {
   requestDocTitleDel,
   requestDocDepartmentsDel,
-  requestDocTagsDel
+  requestDocTagsDel,
+  requestOneDocTitle,
+  requestOneDocDepartments,
+  requestOneDocTags
 } from "@/api/hospitalManagement";
 import { message } from "@/utils/message";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import doctorOtherDialog from "../dialog/doctorOtherDialog.vue";
 
 interface TableData {
@@ -66,6 +73,14 @@ interface TableData {
   desc: string;
   image?: string;
 }
+const doctorOtherDialogVisible = ref(false);
+
+watch(doctorOtherDialogVisible, newVal => {
+  if (!newVal) {
+    // 通常在对话框关闭时获取数据
+    emit("getData");
+  }
+});
 
 const { VITE_BASE_URL } = import.meta.env;
 const doctorAvatar =
@@ -85,6 +100,7 @@ const emit = defineEmits<{
   (event: "getData"): void;
   (event: "updatePage", page: number, size: number): void;
 }>();
+
 const currentPage = ref(1);
 const pageSize = ref(8);
 const handleSizeChange = (val: number) => {
@@ -110,7 +126,20 @@ const handleRemove = (titel: string, id: string) => {
   }
 };
 
-const handleUpdata = (titel: string, id: string) => {
+const docDetails = ref<TableData>();
+
+const handleUpdata = async (titel: string, id: string) => {
+  switch (titel) {
+    case "医生标签":
+      await upDocTags(id);
+      break;
+    case "医院科室":
+      await upDocDepartments(id);
+      break;
+    case "医生职称":
+      await upDocTitle(id);
+      break;
+  }
   doctorOtherDialogVisible.value = true;
 };
 
@@ -150,6 +179,34 @@ const delDocTags = async (id: string) => {
   });
 };
 
-const doctorOtherDialogVisible = ref(false);
+const upDocTitle = async (id: string) => {
+  await requestOneDocTitle(id).then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docDetails.value = data;
+      console.log(docDetails.value);
+    }
+  });
+};
+
+const upDocDepartments = async (id: string) => {
+  await requestOneDocDepartments(id).then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docDetails.value = data;
+      console.log(docDetails.value);
+    }
+  });
+};
+
+const upDocTags = async (id: string) => {
+  await requestOneDocTags(id).then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docDetails.value = data;
+      console.log(docDetails.value);
+    }
+  });
+};
 </script>
 <style lang="scss" scoped></style>
