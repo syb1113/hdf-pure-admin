@@ -90,7 +90,7 @@ export const useUserStore = defineStore("pure-user", {
               nickname: data.userName,
               permissions: ["*:*:*"],
               refreshToken: res.data,
-              roles: ["admin"],
+              roles: data.username == "admin" ? ["admin"] : ["admin", "common"],
               username: data.userName,
               userId: data.userId
             };
