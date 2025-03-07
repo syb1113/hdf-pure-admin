@@ -76,8 +76,8 @@ interface TableData {
 const doctorOtherDialogVisible = ref(false);
 
 watch(doctorOtherDialogVisible, newVal => {
+  // 对话框关闭时获取数据
   if (!newVal) {
-    // 通常在对话框关闭时获取数据
     emit("getData");
   }
 });
