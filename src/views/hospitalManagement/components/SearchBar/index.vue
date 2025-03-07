@@ -30,6 +30,7 @@
           placeholder="请输入关键词(名称)"
         /> -->
       </el-form-item>
+      <slot />
       <el-form-item>
         <el-button
           :icon="Search"
