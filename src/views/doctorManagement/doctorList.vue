@@ -194,9 +194,9 @@ const requestDoctoreAdd = () => {
       <div class="mt-3">
         <el-table :data="tableData" style="width: 100%">
           <el-table-column fixed="left" type="index" label="#" width="100" />
-          <el-table-column prop="name" label="医生名字" width="120" />
+          <el-table-column prop="name" label="医生名字" min-width="120" />
           <el-table-column prop="desc" label="医生简介" min-width="200" />
-          <el-table-column prop="tags" label="医生特长" width="120">
+          <el-table-column prop="tags" label="医生特长" min-width="120">
             <template #default="{ row }">
               <el-tag
                 v-for="i in splitTags(row.tags)"
@@ -206,7 +206,7 @@ const requestDoctoreAdd = () => {
               >
             </template>
           </el-table-column>
-          <el-table-column prop="content" label="医生描述" width="160" />
+          <el-table-column prop="content" label="医生描述" min-width="160" />
           <el-table-column prop="avatar" label="证件照" width="120">
             <template #default="{ row }">
               <el-avatar
@@ -251,7 +251,7 @@ const requestDoctoreAdd = () => {
               <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="200">
+          <el-table-column fixed="right" label="操作" width="180">
             <template #default="{ row }">
               <el-button type="primary" size="small" @click="handleClick(row)"
                 >详情</el-button
