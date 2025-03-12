@@ -2,14 +2,14 @@
   <div>
     <el-dialog
       v-model="doctoreAddVisible"
-      title="添加医生"
-      width="600"
+      title="新增医院"
+      width="800"
       :show-close="false"
     >
       <el-form
         ref="ruleFormRef"
         :model="form"
-        style="max-width: 600px"
+        style="max-width: 800px"
         :rules="rules"
       >
         <el-form-item
@@ -32,17 +32,6 @@
             v-model="form.desc"
             clearable
             placeholder="请输入医院简介"
-          />
-        </el-form-item>
-        <el-form-item
-          label="医院详情介绍"
-          :label-width="formLabelWidth"
-          prop="content"
-        >
-          <el-input
-            v-model="form.content"
-            clearable
-            placeholder="请输入医院详情介绍"
           />
         </el-form-item>
         <!-- <el-form-item
@@ -79,6 +68,7 @@
             placeholder="请输入医院电话"
           />
         </el-form-item>
+
         <el-form-item
           label="医院图像上传"
           :label-width="formLabelWidth"
@@ -98,6 +88,19 @@
             <img :src="dialogImageUrl" alt="Preview Image" />
           </el-dialog>
         </el-form-item>
+
+        <el-form-item
+          label="医院详情介绍"
+          :label-width="formLabelWidth"
+          prop="content"
+        >
+          <!-- <el-input
+            v-model="form.content"
+            clearable
+            placeholder="请输入医院详情介绍"
+          /> -->
+          <Editor ref="editorRef" v-model="form.content" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -111,7 +114,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, defineEmits } from "vue";
+import {
+  ref,
+  onMounted,
+  reactive,
+  defineEmits,
+  shallowRef,
+  onBeforeUnmount
+} from "vue";
 const { VITE_BASE_URL } = import.meta.env;
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
@@ -119,7 +129,7 @@ import type { UploadProps, UploadUserFile } from "element-plus";
 import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import { requestAddHospital } from "@/api/hospitalManagement";
 import areaSelected from "../areaSelected.vue";
-
+import Editor from "@/components/Editor/index.vue";
 interface RuleForm {
   name: string;
   desc: string;
@@ -129,7 +139,7 @@ interface RuleForm {
   address: string;
   addressInfo?: string;
 }
-
+const editorRef = ref(null);
 const doctoreAddVisible = defineModel<boolean>();
 const formLabelWidth = "140px";
 const uploadAction = VITE_BASE_URL + "/common/upload";
@@ -244,7 +254,6 @@ const rules = reactive<FormRules<RuleForm>>({
     }
   ]
 });
-
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
@@ -256,7 +265,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       // console.log(data);
       requestAddHospital(form.value).then((res: any) => {
         const { success, errorMessage } = res;
-        console.log(res);
         if (success) {
           ElMessage.success("添加成功");
           emit("getData");

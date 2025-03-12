@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, provide, inject } from "vue";
+import { useRouter } from "vue-router";
 import { utils, writeFile } from "xlsx";
 import {
   requestHospitalList,
@@ -39,7 +40,7 @@ interface HostipalData {
 onMounted(() => {
   getData();
 });
-
+const router = useRouter();
 const hospitalAddVisible = ref<boolean>(false);
 const hospitalDetailVisible = ref<boolean>(false);
 const disabled = ref<boolean>(true);
@@ -48,10 +49,8 @@ const hospitalData = ref<HostipalData>();
 const detailRef = ref(null);
 // const addressStore = useAddressStore();
 const handleClick = (row: TableData) => {
-  // addressStore.setAddress(row.address);
-  getHostpitalDetails(row);
-  hospitalDetailVisible.value = true;
-  disabled.value = true;
+  const id = row.id;
+  router.push(`/hospitalManagement/hospitalDetails/${id}`);
 };
 
 // 修改
@@ -176,7 +175,11 @@ const requestHospitalAdd = () => {
           <el-table-column fixed="left" type="index" label="#" width="100" />
           <el-table-column prop="name" label="医院名称" />
           <el-table-column prop="desc" label="医院简介" min-width="200" />
-          <el-table-column prop="content" label="医院详情" width="160" />
+          <!-- <el-table-column prop="content" label="医院详情" min-width="300">
+            <template #default="{ row }">
+              <div v-html="row.content" />
+            </template>
+          </el-table-column> -->
           <el-table-column prop="image" label="医院照片" width="120">
             <template #default="{ row }">
               <el-avatar

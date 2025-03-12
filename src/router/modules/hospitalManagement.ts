@@ -42,6 +42,15 @@ export default {
       meta: {
         title: $t("menus.pureDoctorsTags")
       }
+    },
+    {
+      path: "/hospitalManagement/hospitalDetails/:id",
+      name: "hospitalDetails",
+      component: () => import("@/views/hospitalManagement/hospitalDetails.vue"),
+      meta: {
+        title: $t("menus.pureHospitalDetails"),
+        showLink: false
+      }
     }
   ]
 } satisfies RouteConfigsTable;

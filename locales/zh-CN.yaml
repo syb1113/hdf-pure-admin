@@ -72,6 +72,7 @@ menus:
   pureDoctorsTitles: 医生职称
   pureDoctorsTags: 医生标签
   pureDoctorAdd: 添加医生
+  pureHospitalDetails: 医院详情
   pureLogin: 登录
   pureEmpty: 无Layout页
   pureTable: 表格

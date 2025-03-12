@@ -3,13 +3,13 @@
     <el-dialog
       v-model="hospitalDetailVisible"
       title="医院详情"
-      width="600"
+      width="800"
       :show-close="false"
     >
       <el-form
         ref="ruleFormRef"
         :model="form"
-        style="max-width: 600px"
+        style="max-width: 800px"
         :rules="rules"
       >
         <el-form-item
@@ -36,18 +36,7 @@
             :disabled="disabled"
           />
         </el-form-item>
-        <el-form-item
-          label="医院详情介绍"
-          :label-width="formLabelWidth"
-          prop="content"
-        >
-          <el-input
-            v-model="form.content"
-            clearable
-            :placeholder="form.content ? form.content : ''"
-            :disabled="disabled"
-          />
-        </el-form-item>
+
         <!-- <el-form-item
           label="医院地址"
           :label-width="formLabelWidth"
@@ -97,6 +86,18 @@
             :disabled="disabled"
           />
         </el-form-item>
+        <el-form-item
+          label="医院详情介绍"
+          :label-width="formLabelWidth"
+          prop="content"
+        >
+          <!-- <el-input
+            v-model="form.content"
+            clearable
+            placeholder="请输入医院详情介绍"
+          /> -->
+          <Editor ref="editorRef" v-model="form.content" />
+        </el-form-item>
         <!-- <el-form-item
           label="医院图像上传"
           :label-width="formLabelWidth"
@@ -138,6 +139,7 @@ import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import { requestEditHospital } from "@/api/hospitalManagement";
 import areaSelected from "../areaSelected.vue";
 import { log } from "console";
+import Editor from "@/components/Editor/index.vue";
 
 interface RuleForm {
   readonly id?: string;
