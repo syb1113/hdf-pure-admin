@@ -4,7 +4,7 @@
     <el-card shadow="always">
       <departmentsTable
         :tableData="tableData"
-        :title="'医生职称'"
+        :title="'医生标签'"
         :total="total"
         @getData="getDoctorTags"
         @updatePage="upadatPage"

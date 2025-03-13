@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       v-model="doctorOtherDialogVisible"
-      :title="title"
+      :title="add ? '新增' + title : title"
       width="600"
       center
     >
@@ -103,9 +103,10 @@ const handleUploadSuccess: UploadProps["onSuccess"] = (response, file) => {
 
 const ruleFormRef = ref<FormInstance>();
 
-const { docDetails, title } = defineProps<{
+const { docDetails, title, add } = defineProps<{
   docDetails: RuleForm;
   title: string;
+  add: boolean;
 }>();
 const ruleForm = ref<RuleForm>({
   ...docDetails

@@ -91,7 +91,6 @@ import {
   requestEditDrug
 } from "@/api/drugManage";
 import { requestDiseaseList } from "@/api/diseaseManage";
-import illustration from "@/assets/login/illustration.svg?component";
 
 interface RuleForm {
   id?: string;
@@ -137,8 +136,8 @@ const ruleForm = ref<RuleForm>({
 });
 watch(
   () => id,
-  (newVal: string) => {
-    getDrugDetails(newVal);
+  async (newVal: string) => {
+    await getDrugDetails(newVal);
     getDrugTypeList();
     getDiseaseTypeList();
   },
@@ -195,8 +194,6 @@ const handleUploadSuccess: UploadProps["onSuccess"] = (response, file) => {
 const getDrugDetails = async (id: string) => {
   await requestOneDrug(id).then((res: any) => {
     const { data, success } = res;
-    console.log(data.medicineCategoryId);
-
     if (success) {
       ruleForm.value.name = data.name;
       ruleForm.value.desc = data.desc;
@@ -246,11 +243,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       ruleForm.value.amount = parseInt(ruleForm.value.amount);
       console.log("ruleForm-->", ruleForm.value);
       upDrugDetails();
-      drugDialogVisible.value = false;
     } else {
       message("修改失败", { type: "error" });
     }
   });
+  drugDialogVisible.value = false;
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

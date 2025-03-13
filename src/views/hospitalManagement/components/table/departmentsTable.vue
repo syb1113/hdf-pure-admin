@@ -1,5 +1,8 @@
 <template>
   <div>
+    <el-button class="mb-3" :icon="Plus" type="primary" @click="otherAdd"
+      >新增{{ title }}</el-button
+    >
     <el-table :data="tableData">
       <el-table-column fixed type="selection" />
       <el-table-column fixed="left" :index="index" type="index" label="#" />
@@ -50,6 +53,7 @@
       v-model="doctorOtherDialogVisible"
       :title="title"
       :docDetails="docDetails"
+      :add="add"
     />
   </div>
 </template>
@@ -66,6 +70,7 @@ import {
 import { message } from "@/utils/message";
 import { ref, onMounted, computed, watch } from "vue";
 import doctorOtherDialog from "../dialog/doctorOtherDialog.vue";
+import { Plus } from "@element-plus/icons-vue";
 
 interface TableData {
   id: string;
@@ -100,7 +105,7 @@ const emit = defineEmits<{
   (event: "getData"): void;
   (event: "updatePage", page: number, size: number): void;
 }>();
-
+const add = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(8);
 const handleSizeChange = (val: number) => {
@@ -127,8 +132,13 @@ const handleRemove = (titel: string, id: string) => {
 };
 
 const docDetails = ref<TableData>();
-
+const otherAdd = () => {
+  add.value = true;
+  docDetails.value = null;
+  doctorOtherDialogVisible.value = true;
+};
 const handleUpdata = async (titel: string, id: string) => {
+  add.value = false;
   switch (titel) {
     case "医生标签":
       await upDocTags(id);

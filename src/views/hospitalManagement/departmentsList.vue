@@ -42,7 +42,6 @@ const searchData = (search: string | any) => {
   params.value.name = search;
   getDepartments();
 };
-
 const upadatPage = (page: number, size: number) => {
   console.log(page, size);
   params.value.page = page;

@@ -5,7 +5,7 @@
       <departmentsTable
         :tableData="tableData"
         :total="total"
-        :title="'医生标签'"
+        :title="'医生职称'"
         @getData="getDoctortitles"
         @updatePage="upadatPage"
       />
