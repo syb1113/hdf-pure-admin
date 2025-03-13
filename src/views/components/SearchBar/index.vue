@@ -11,7 +11,6 @@
       <el-form-item label="关键词" prop="search">
         <el-select
           v-model="ruleForm.search"
-          clearable
           placeholder="请输入关键词(名称)"
           style="width: 300px"
           filterable

@@ -3,6 +3,7 @@
 const home = 0,
   doctor = 1,
   hospital = 2,
+  drug = 3,
   able = 4,
   form = 6,
   list = 7,
@@ -10,4 +11,15 @@ const home = 0,
   error = 9,
   nested = 11;
 
-export { home, doctor, hospital, able, form, list, result, error, nested };
+export {
+  home,
+  doctor,
+  hospital,
+  drug,
+  able,
+  form,
+  list,
+  result,
+  error,
+  nested
+};

@@ -17,7 +17,7 @@ import { requsestDoctortitles } from "@/api/hospitalManagement";
 import { ref, onMounted } from "vue";
 import { message } from "@/utils/message";
 import departmentsTable from "./components/table/departmentsTable.vue";
-import SearchBar from "./components/SearchBar/index.vue";
+import SearchBar from "@/views/components/SearchBar/index.vue";
 
 interface TableData {
   id: string;

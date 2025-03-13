@@ -71,6 +71,11 @@ menus:
   pureDepartmentsAndOther: 科室列表
   pureDoctorsTitles: 医生职称
   pureDoctorsTags: 医生标签
+  pureDrugAndDisManage: 药品及疾病管理
+  pureDrugManage: 药品信息
+  pureDrugType: 药品分类
+  pureDisManage: 疾病信息
+  pureDisType: 疾病分类
   pureDoctorAdd: 添加医生
   pureHospitalDetails: 医院详情
   pureLogin: 登录

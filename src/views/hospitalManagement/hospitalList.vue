@@ -12,7 +12,7 @@ import { ElMessage } from "element-plus";
 import hospitalAddDialog from "./components/dialog/hospitalAddDialog.vue";
 import hospitalDetailsDialog from "./components/dialog/hospitalDetailsDialog.vue";
 import { requsestDelHospital } from "@/api/hospitalManagement";
-import SearchBar from "./components/SearchBar/index.vue";
+import SearchBar from "@/views/components/SearchBar/index.vue";
 
 const { VITE_BASE_URL } = import.meta.env;
 interface TableData {
