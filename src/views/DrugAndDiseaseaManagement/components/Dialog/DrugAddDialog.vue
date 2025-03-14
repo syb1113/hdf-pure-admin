@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog v-model="drugDialogVisible" title="药品修改" width="600" center>
+    <el-dialog v-model="drugAddDialog" title="药品修改" width="600" center>
       <el-form
         ref="ruleFormRef"
         style="max-width: 600px"
@@ -17,7 +17,7 @@
           <el-input v-model="ruleForm.desc" type="textarea" maxlength="30" />
         </el-form-item>
         <el-form-item label="价格" prop="price">
-          <el-input v-model="ruleForm.price" />
+          <el-input v-model="ruleForm.price" placeholder="请输入价格" />
         </el-form-item>
         <el-form-item label="库存" prop="amount">
           <el-input v-model="ruleForm.amount" placeholder="库存为整数" />
@@ -47,7 +47,7 @@
               v-for="item in illnessList"
               :key="item.id"
               :label="item.name"
-              :value="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -85,30 +85,18 @@ import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import {
-  requestOneDrug,
-  requestDrugTypeList,
-  requestEditDrug
-} from "@/api/drugManage";
+import { requestDrugTypeList, requestAddDrug } from "@/api/drugManage";
 import { requestDiseaseList } from "@/api/diseaseManage";
 
 interface RuleForm {
   id?: string;
   name: string;
   desc: string;
-  price: number;
-  amount: number;
+  price: number | null;
+  amount: number | null;
   image: string;
   medicineCategoryId: string;
-  illnesses:
-    | string[]
-    | [
-        {
-          illness: {
-            nmae: string;
-          };
-        }
-      ];
+  illnesses: string[];
 }
 
 const { VITE_BASE_URL } = import.meta.env;
@@ -117,40 +105,38 @@ const dialogImageUrl = ref("");
 const dialogVisible = ref(false);
 const fileList = ref([]);
 const ruleFormRef = ref<FormInstance>();
-const { id } = defineProps<{
-  id: string;
-}>();
-const categoryName = ref();
-const medicineCategoryId = ref();
 const categoryList = ref([]);
 const illnessList = ref([]);
-const drugDialogVisible = defineModel<boolean>();
+const drugAddDialog = defineModel<boolean>();
 const ruleForm = ref<RuleForm>({
   name: "",
   desc: "",
-  price: 0,
-  amount: 0,
+  price: null,
+  amount: null,
   image: "",
   medicineCategoryId: "",
-  illnesses: [""]
+  illnesses: []
 });
 watch(
-  () => id,
-  async (newVal: string) => {
-    await getDrugDetails(newVal);
-    getDrugTypeList();
-    getDiseaseTypeList();
+  () => drugAddDialog,
+  newVal => {
+    if (newVal) {
+      getDrugTypeList();
+      getDiseaseTypeList();
+    }
   },
   { deep: true }
 );
+
+const emit = defineEmits<{
+  (event: "getData"): void;
+}>();
 const getDrugTypeList = async () => {
   await requestDrugTypeList().then((res: any) => {
     const { data, success } = res;
     if (success) {
       categoryList.value = data.list;
       console.log("categoryList-->", categoryList.value);
-    } else {
-      message("获取失败", { type: "error" });
     }
   });
 };
@@ -161,12 +147,9 @@ const getDiseaseTypeList = async () => {
     if (success) {
       illnessList.value = data.list;
       console.log("illnessList-->", illnessList.value);
-    } else {
-      message("获取失败", { type: "error" });
     }
   });
 };
-
 const validatePrice = (rule, value, callback) => {
   const num = Number(value);
   if (isNaN(num)) {
@@ -188,7 +171,6 @@ const validateAmount = (rule, value, callback) => {
     callback();
   }
 };
-
 const rules = reactive<FormRules<RuleForm>>({
   name: [{ required: true, message: "请输入昵称", trigger: "blur" }],
   price: [
@@ -217,78 +199,39 @@ const handleUploadSuccess: UploadProps["onSuccess"] = (response, file) => {
   const { success, data } = response;
   if (success) {
     ElMessage.success("上传成功");
-    console.log(data);
-    console.log(fileList.value);
     ruleForm.value.image = data;
   } else {
     ElMessage.error("上传失败");
   }
 };
-const getDrugDetails = async (id: string) => {
-  await requestOneDrug(id).then((res: any) => {
-    const { data, success } = res;
-    if (success) {
-      ruleForm.value.name = data.name;
-      ruleForm.value.desc = data.desc;
-      ruleForm.value.price = data.price;
-      ruleForm.value.amount = data.amount;
-      ruleForm.value.image = data.image;
-      ruleForm.value.medicineCategoryId = data.category.name;
-      medicineCategoryId.value = data.medicineCategoryId;
-      categoryName.value = data.category.name;
-      ruleForm.value.illnesses = data.illnessMedicine.map(
-        item => item.illness.name
-      );
-      console.log("ruleForm-->", ruleForm.value);
-      fileList.value.length = 0;
-      if (ruleForm.value.image != "") {
-        fileList.value.push(ruleForm.value.image);
-      }
-    } else {
-      message("获取失败", { type: "error" });
-    }
-  });
-};
-const upDrugDetails = () => {
-  requestEditDrug(id, ruleForm.value).then((res: any) => {
-    message("修改成功", { type: "success" });
-  });
-};
+
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      const illnesses = ruleForm.value.illnesses
-        .map(name => {
-          const illness = illnessList.value.find(item => item.name === name);
-          return illness ? illness.id : "";
-        })
-        .filter(id => id !== "");
-      if (ruleForm.value.medicineCategoryId !== categoryName.value) {
-        ruleForm.value.medicineCategoryId = categoryList.value.find(
-          item => item.id == ruleForm.value.medicineCategoryId
-        ).id;
-      } else {
-        ruleForm.value.medicineCategoryId = medicineCategoryId.value;
-      }
-      ruleForm.value.illnesses = illnesses;
-      ruleForm.value.price = Number(ruleForm.value.price);
-      ruleForm.value.amount = parseInt(ruleForm.value.amount);
       console.log("ruleForm-->", ruleForm.value);
-      upDrugDetails();
+      ruleForm.value.price = Number(ruleForm.value.price);
+      ruleForm.value.amount = Number(ruleForm.value.amount);
+      requestAddDrug(ruleForm.value).then(res => {
+        const { success } = res;
+        if (success) {
+          message("添加成功", { type: "success" });
+          emit("getData");
+        }
+      });
     } else {
-      message("修改失败", { type: "error" });
+      message("添加失败", { type: "error" });
     }
   });
-  drugDialogVisible.value = false;
+  drugAddDialog.value = false;
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
-  message("你已取消修改", { type: "info" });
+  message("你已取消添加", { type: "info" });
   fileList.value.length = 0;
-  drugDialogVisible.value = false;
+  drugAddDialog.value = false;
 };
 </script>
 <style lang="scss" scoped></style>

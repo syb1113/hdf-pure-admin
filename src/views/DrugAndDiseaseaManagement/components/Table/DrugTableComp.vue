@@ -57,7 +57,12 @@
       </el-table-column>
       <el-table-column fixed="right" align="center" label="操作">
         <template #default="{ row }">
-          <el-button type="danger" :icon="Delete" size="small">
+          <el-button
+            type="danger"
+            :icon="Delete"
+            size="small"
+            @click="delDrug(row.id)"
+          >
             删除
           </el-button>
           <el-button
@@ -88,7 +93,7 @@
 </template>
 <script setup lang="ts">
 import { Edit, Delete } from "@element-plus/icons-vue";
-import { requestOneDrug } from "@/api/drugManage";
+import { requestOneDrug, requsestDelDrug } from "@/api/drugManage";
 import { message } from "@/utils/message";
 import { ref, onMounted, computed, watch } from "vue";
 import DrugDetailsUp from "../Dialog/DrugDetailsUp.vue";
@@ -151,6 +156,16 @@ const drugId = ref();
 const upDrugDetails = async (id: string) => {
   drugId.value = id;
   drugDialogVisible.value = true;
+};
+
+const delDrug = async (id: string) => {
+  const res = await requsestDelDrug(id);
+  if (res.success) {
+    message("删除成功", { type: "success" });
+    emit("getData");
+  } else {
+    message("删除失败", { type: "error" });
+  }
 };
 </script>
 <style lang="scss" scoped></style>
