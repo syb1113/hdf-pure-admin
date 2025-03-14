@@ -16,8 +16,16 @@ export default {
       component: () =>
         import("@/views/DrugAndDiseaseaManagement/drugManagement.vue"),
       meta: {
-        title: $t("menus.pureDrugManage"),
-        showParent: true
+        title: $t("menus.pureDrugManage")
+      }
+    },
+    {
+      path: "/drugAndDiseaseManagement/drugTypeManagement",
+      name: "drugTypeManagement",
+      component: () =>
+        import("@/views/DrugAndDiseaseaManagement/drugTypeManagement.vue"),
+      meta: {
+        title: $t("menus.pureDrugType")
       }
     }
   ]

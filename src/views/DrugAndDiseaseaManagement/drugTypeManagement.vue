@@ -2,28 +2,23 @@
   <div>
     <SearchBar :options-lit="tableData" @search="searchData" />
     <el-card>
-      <el-button class="mb-3" :icon="Plus" type="primary" @click="drugAdd"
-        >新增药品</el-button
-      >
-      <DrugTableComp
-        :table-data="tableData"
+      <DrugTypeTableComp
+        :tableData="tableData"
+        :title="'药品'"
         :total="total"
-        @getData="getDrugList"
+        @get-data="getDrugTypeList"
         @updatePage="upadatPage"
       />
     </el-card>
-    <DrugAddDialog v-model="drugAddDialog" @get-data="getDrugList" />
   </div>
 </template>
 
 <script setup lang="ts">
 import SearchBar from "@/views/components/SearchBar/index.vue";
-import DrugTableComp from "./components/Table/DrugTableComp.vue";
+import DrugTypeTableComp from "./components/Table/DrugTypeTableComp.vue";
 import { ref, onMounted } from "vue";
-import { requestDrugList } from "@/api/drugManage";
+import { requestDrugTypeList } from "@/api/drugManage";
 import { message } from "@/utils/message";
-import DrugAddDialog from "./components/Dialog/DrugAddDialog.vue";
-import { Plus } from "@element-plus/icons-vue";
 
 const tableData = ref();
 const total = ref(0);
@@ -33,16 +28,17 @@ const pages = ref({
   name: ""
 });
 onMounted(() => {
-  getDrugList();
+  getDrugTypeList();
 });
 const upadatPage = (page: number, size: number) => {
   console.log(page, size);
   pages.value.page = page;
   pages.value.per = size;
-  getDrugList();
+  getDrugTypeList();
 };
-const getDrugList = async () => {
-  await requestDrugList(pages.value).then((res: any) => {
+
+const getDrugTypeList = async () => {
+  await requestDrugTypeList(pages.value).then((res: any) => {
     const { data, success } = res;
     if (success) {
       tableData.value = data.list;
@@ -54,12 +50,8 @@ const getDrugList = async () => {
 };
 const searchData = (search: string | any) => {
   pages.value.name = search;
-  getDrugList();
-};
-
-const drugAddDialog = ref<boolean>(false);
-const drugAdd = () => {
-  drugAddDialog.value = true;
+  getDrugTypeList();
 };
 </script>
+
 <style lang="scss" scoped></style>
