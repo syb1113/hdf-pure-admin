@@ -94,6 +94,7 @@ const emit = defineEmits<{
   (event: "getData"): void;
   (event: "updatePage", page: number, size: number): void;
 }>();
+
 const add = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(8);
