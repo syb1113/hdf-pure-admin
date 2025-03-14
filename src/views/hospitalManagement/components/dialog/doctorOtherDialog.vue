@@ -58,7 +58,10 @@ import { Plus } from "@element-plus/icons-vue";
 import {
   requestOneDocTitleUp,
   requestOneDocDepartmentsUp,
-  requestOneDocTagsUp
+  requestOneDocTagsUp,
+  requestAddDoctortitles,
+  requestAddDocTags,
+  requestAddDocDepartments
 } from "@/api/hospitalManagement";
 
 interface RuleForm {
@@ -118,13 +121,27 @@ const rules = reactive<FormRules<RuleForm>>({
 const handleUpDocDetails = async (id: string) => {
   switch (title) {
     case "医生标签":
-      await upDocTitle(id);
+      await upDocTags(id);
       break;
     case "医院科室":
       await upDocDepartments(id);
       break;
     case "医生职称":
-      await upDocTags(id);
+      await upDocTitle(id);
+      break;
+  }
+};
+
+const handleAdd = async () => {
+  switch (title) {
+    case "医生标签":
+      await addDocTags();
+      break;
+    case "医院科室":
+      await addDocDepartments();
+      break;
+    case "医生职称":
+      await addDocTitle();
       break;
   }
 };
@@ -133,12 +150,15 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log(docDetails.id);
-      handleUpDocDetails(docDetails.id);
-      message("修改成功", { type: "success" });
+      if (!add) {
+        handleUpDocDetails(docDetails.id);
+      } else {
+        handleAdd();
+      }
+      message(`${add ? "添加" : "修改"}成功`, { type: "success" });
       doctorOtherDialogVisible.value = false;
     } else {
-      message("修改失败", { type: "error" });
+      message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
   });
 };
@@ -146,16 +166,50 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
-  message("你已取消修改", { type: "info" });
+  message(`你已取消${add ? "添加" : "修改"}`, { type: "info" });
   fileList.value.length = 0;
   doctorOtherDialogVisible.value = false;
+};
+
+const addDocTitle = async () => {
+  await requestAddDoctortitles({ ...ruleForm.value }).then((res: any) => {
+    console.log(res);
+    const { success } = res;
+    if (success) {
+      // message("修改成功", { type: "success" });
+    } else {
+      message("添加失败", { type: "error" });
+    }
+  });
+};
+
+const addDocDepartments = async () => {
+  await requestAddDocDepartments({ ...ruleForm.value }).then((res: any) => {
+    const { success } = res;
+    if (success) {
+      // message("修改成功", { type: "success" });
+    } else {
+      message("添加失败", { type: "error" });
+    }
+  });
+};
+
+const addDocTags = async () => {
+  await requestAddDocTags({ ...ruleForm.value }).then((res: any) => {
+    const { success } = res;
+    if (success) {
+      // message("修改成功", { type: "success" });
+    } else {
+      message("添加失败", { type: "error" });
+    }
+  });
 };
 
 const upDocTitle = async (id: string) => {
   await requestOneDocTitleUp({ ...ruleForm.value }, id).then((res: any) => {
     const { success } = res;
     if (success) {
-      message("修改成功", { type: "success" });
+      // message("修改成功", { type: "success" });
     } else {
       message("修改失败", { type: "error" });
     }
@@ -167,7 +221,7 @@ const upDocDepartments = async (id: string) => {
     (res: any) => {
       const { success } = res;
       if (success) {
-        message("修改成功", { type: "success" });
+        // message("修改成功", { type: "success" });
       } else {
         message("修改失败", { type: "error" });
       }
@@ -179,7 +233,7 @@ const upDocTags = async (id: string) => {
   await requestOneDocTagsUp({ ...ruleForm.value }, id).then((res: any) => {
     const { success } = res;
     if (success) {
-      message("修改成功", { type: "success" });
+      // message("修改成功", { type: "success" });
     } else {
       message("修改失败", { type: "error" });
     }

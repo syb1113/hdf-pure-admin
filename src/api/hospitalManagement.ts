@@ -132,3 +132,24 @@ export const requestOneDocTagsUp = (data: object, id: string) => {
     }
   );
 };
+
+/**新增医生职称 */
+export const requestAddDoctortitles = (data: object) => {
+  return http.request<requestResult>("post", baseUrlAdmin("doctor_titles"), {
+    data
+  });
+};
+
+/**新增医生标签 */
+export const requestAddDocTags = (data: object) => {
+  return http.request<requestResult>("post", baseUrlAdmin("doctor_tags"), {
+    data
+  });
+};
+
+/**新增科室信息 */
+export const requestAddDocDepartments = (data: object) => {
+  return http.request<requestResult>("post", baseUrlAdmin("departments"), {
+    data
+  });
+};
