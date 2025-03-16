@@ -82,6 +82,6 @@ export const requestEditDrugType = (id: string, data: object) => {
 export const requsestDelDrugType = (id: string) => {
   return http.request<requestResult>(
     "delete",
-    baseUrlAdmin(`medicines_categories/${id}`)
+    baseUrlAdmin(`medicine_categories/${id}`)
   );
 };

@@ -49,6 +49,12 @@
         @current-change="handleCurrentChange"
       />
     </div>
+    <TypeAddDialog
+      v-model="TypeAddDialogVisible"
+      :title="title"
+      :add="add"
+      :doc-details="docDetails"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -61,19 +67,24 @@ import {
   requsestDelDrugType,
   requestOneDrugType
 } from "@/api/drugManage";
+import {
+  requestEditDiseaseType,
+  requsestDelDiseaseType,
+  requestOneDiseaseType
+} from "@/api/diseaseManage";
+import TypeAddDialog from "../Dialog/TypeAddDialog.vue";
+
 interface TableData {
   id: string;
   name: string;
   desc: string;
   image?: string;
 }
-const doctorOtherDialogVisible = ref(false);
+const TypeAddDialogVisible = ref(false);
 
-watch(doctorOtherDialogVisible, newVal => {
+watch(TypeAddDialogVisible, newVal => {
   // 对话框关闭时获取数据
-  if (!newVal) {
-    emit("getData");
-  }
+  emit("getData");
 });
 
 const { VITE_BASE_URL } = import.meta.env;
@@ -109,9 +120,11 @@ const handleCurrentChange = (val: number) => {
 
 const handleRemove = (titel: string, id: string) => {
   switch (titel) {
-    case "医生标签":
+    case "药品分类":
+      delOneDrugType(id);
       break;
-    case "医生职称":
+    case "疾病分类":
+      delOneDiseaseType(id);
       break;
   }
 };
@@ -120,18 +133,63 @@ const docDetails = ref<TableData>();
 const otherAdd = () => {
   add.value = true;
   docDetails.value = null;
-  doctorOtherDialogVisible.value = true;
+  TypeAddDialogVisible.value = true;
 };
 
 const handleUpdata = async (titel: string, id: string) => {
   add.value = false;
   switch (titel) {
-    case "医生标签":
+    case "药品分类":
+      upDrugTypeDeails(id);
       break;
-    case "医生职称":
+    case "疾病分类":
+      upDiseaseTypeDeails(id);
       break;
   }
-  doctorOtherDialogVisible.value = true;
+  TypeAddDialogVisible.value = true;
+};
+const upDrugTypeDeails = async (id: string) => {
+  await requestOneDrugType(id).then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docDetails.value = data;
+    }
+  });
+};
+
+const upDiseaseTypeDeails = async (id: string) => {
+  console.log(id);
+  await requestOneDiseaseType(id).then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docDetails.value = data;
+    }
+  });
+};
+
+const delOneDrugType = async (id: string) => {
+  console.log(id);
+  await requsestDelDrugType(id).then((res: any) => {
+    const { success } = res;
+    if (!success) {
+      message("删除失败", { type: "error" });
+      return;
+    }
+    message("删除成功", { type: "success" });
+    emit("getData");
+  });
+};
+
+const delOneDiseaseType = async (id: string) => {
+  await requsestDelDiseaseType(id).then((res: any) => {
+    const { success } = res;
+    if (!success) {
+      message("删除失败", { type: "error" });
+      return;
+    }
+    message("删除成功", { type: "success" });
+    emit("getData");
+  });
 };
 </script>
 <style lang="scss" scoped></style>

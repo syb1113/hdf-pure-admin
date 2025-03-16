@@ -4,9 +4,9 @@
     <el-card>
       <TypeTableComp
         :tableData="tableData"
-        :title="'药品分类'"
+        :title="'疾病分类'"
         :total="total"
-        @get-data="getDiseaseTypeList"
+        @get-data="getDrugTypeList"
         @updatePage="upadatPage"
       />
     </el-card>
@@ -27,16 +27,16 @@ const pages = ref({
   name: ""
 });
 onMounted(() => {
-  getDiseaseTypeList();
+  getDrugTypeList();
 });
 const upadatPage = (page: number, size: number) => {
   console.log(page, size);
   pages.value.page = page;
   pages.value.per = size;
-  getDiseaseTypeList();
+  getDrugTypeList();
 };
 
-const getDiseaseTypeList = async () => {
+const getDrugTypeList = async () => {
   await requestDiseaseTypeList(pages.value).then((res: any) => {
     const { data, success } = res;
     if (success) {
@@ -49,7 +49,7 @@ const getDiseaseTypeList = async () => {
 };
 const searchData = (search: string | any) => {
   pages.value.name = search;
-  getDiseaseTypeList();
+  getDrugTypeList();
 };
 </script>
 

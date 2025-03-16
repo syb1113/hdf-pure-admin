@@ -27,6 +27,15 @@ export default {
       meta: {
         title: $t("menus.pureDrugType")
       }
+    },
+    {
+      path: "/drugAndDiseaseManagement/diseaseTypeManage",
+      name: "diseaseTypeManage",
+      component: () =>
+        import("@/views/DrugAndDiseaseaManagement/diseaseTypeManage.vue"),
+      meta: {
+        title: $t("menus.pureDisType")
+      }
     }
   ]
 } satisfies RouteConfigsTable;

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      v-model="doctorOtherDialogVisible"
+      v-model="TypeAddDialogVisible"
       :title="add ? '新增' + title : title"
       width="600"
       center
@@ -55,14 +55,11 @@ import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
+import { requestAddDrugType, requestEditDrugType } from "@/api/drugManage";
 import {
-  requestOneDocTitleUp,
-  requestOneDocDepartmentsUp,
-  requestOneDocTagsUp,
-  requestAddDoctortitles,
-  requestAddDocTags,
-  requestAddDocDepartments
-} from "@/api/hospitalManagement";
+  requestAddDiseaseType,
+  requestEditDiseaseType
+} from "@/api/diseaseManage";
 
 interface RuleForm {
   id: string;
@@ -120,28 +117,22 @@ const rules = reactive<FormRules<RuleForm>>({
 
 const handleUpDocDetails = async (id: string) => {
   switch (title) {
-    case "医生标签":
-      await upDocTags(id);
+    case "药品分类":
+      await upDrugType(id);
       break;
-    case "医院科室":
-      await upDocDepartments(id);
-      break;
-    case "医生职称":
-      await upDocTitle(id);
+    case "疾病分类":
+      await upDiseaseType(id);
       break;
   }
 };
 
 const handleAdd = async () => {
   switch (title) {
-    case "医生标签":
-      await addDocTags();
+    case "药品分类":
+      await addDrugType();
       break;
-    case "医院科室":
-      await addDocDepartments();
-      break;
-    case "医生职称":
-      await addDocTitle();
+    case "疾病分类":
+      await addDiseaseType();
       break;
   }
 };
@@ -156,12 +147,12 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         handleAdd();
       }
       message(`${add ? "添加" : "修改"}成功`, { type: "success" });
-      doctorOtherDialogVisible.value = false;
+      TypeAddDialogVisible.value = false;
     } else {
       message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
     formEl.resetFields();
-    doctorOtherDialogVisible.value = false;
+    TypeAddDialogVisible.value = false;
   });
 };
 
@@ -170,12 +161,11 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields();
   message(`你已取消${add ? "添加" : "修改"}`, { type: "info" });
   fileList.value.length = 0;
-  doctorOtherDialogVisible.value = false;
+  TypeAddDialogVisible.value = false;
 };
 
-const addDocTitle = async () => {
-  await requestAddDoctortitles({ ...ruleForm.value }).then((res: any) => {
-    console.log(res);
+const addDiseaseType = async () => {
+  await requestAddDiseaseType({ ...ruleForm.value }).then((res: any) => {
     const { success } = res;
     if (success) {
       // message("修改成功", { type: "success" });
@@ -185,8 +175,8 @@ const addDocTitle = async () => {
   });
 };
 
-const addDocDepartments = async () => {
-  await requestAddDocDepartments({ ...ruleForm.value }).then((res: any) => {
+const addDrugType = async () => {
+  await requestAddDrugType({ ...ruleForm.value }).then((res: any) => {
     const { success } = res;
     if (success) {
       // message("修改成功", { type: "success" });
@@ -196,19 +186,8 @@ const addDocDepartments = async () => {
   });
 };
 
-const addDocTags = async () => {
-  await requestAddDocTags({ ...ruleForm.value }).then((res: any) => {
-    const { success } = res;
-    if (success) {
-      // message("修改成功", { type: "success" });
-    } else {
-      message("添加失败", { type: "error" });
-    }
-  });
-};
-
-const upDocTitle = async (id: string) => {
-  await requestOneDocTitleUp({ ...ruleForm.value }, id).then((res: any) => {
+const upDiseaseType = async (id: string) => {
+  await requestEditDiseaseType(id, { ...ruleForm.value }).then((res: any) => {
     const { success } = res;
     if (success) {
       // message("修改成功", { type: "success" });
@@ -218,21 +197,8 @@ const upDocTitle = async (id: string) => {
   });
 };
 
-const upDocDepartments = async (id: string) => {
-  await requestOneDocDepartmentsUp({ ...ruleForm.value }, id).then(
-    (res: any) => {
-      const { success } = res;
-      if (success) {
-        // message("修改成功", { type: "success" });
-      } else {
-        message("修改失败", { type: "error" });
-      }
-    }
-  );
-};
-
-const upDocTags = async (id: string) => {
-  await requestOneDocTagsUp({ ...ruleForm.value }, id).then((res: any) => {
+const upDrugType = async (id: string) => {
+  await requestEditDrugType(id, { ...ruleForm.value }).then((res: any) => {
     const { success } = res;
     if (success) {
       // message("修改成功", { type: "success" });
@@ -242,6 +208,6 @@ const upDocTags = async (id: string) => {
   });
 };
 
-const doctorOtherDialogVisible = defineModel<boolean>();
+const TypeAddDialogVisible = defineModel<boolean>();
 </script>
 <style lang="scss" scoped></style>

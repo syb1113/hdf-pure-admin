@@ -251,7 +251,7 @@ const requestDoctoreAdd = () => {
               <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="180">
+          <el-table-column fixed="right" label="操作" min-width="200">
             <template #default="{ row }">
               <el-button type="primary" size="small" @click="handleClick(row)"
                 >详情</el-button

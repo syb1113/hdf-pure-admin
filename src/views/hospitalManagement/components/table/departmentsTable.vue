@@ -81,10 +81,7 @@ interface TableData {
 const doctorOtherDialogVisible = ref(false);
 
 watch(doctorOtherDialogVisible, newVal => {
-  // 对话框关闭时获取数据
-  if (!newVal) {
-    emit("getData");
-  }
+  emit("getData");
 });
 
 const { VITE_BASE_URL } = import.meta.env;

@@ -122,9 +122,7 @@ watch(
   () => drugDialogVisible.value,
   newVal => {
     // 对话框关闭时获取数据
-    if (!newVal) {
-      emit("getData");
-    }
+    emit("getData");
   }
 );
 const { tableData, total } = defineProps<{

@@ -13,7 +13,7 @@
         <el-form-item label="昵称" prop="name">
           <el-input v-model="ruleForm.name" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item label="描述" prop="desc">
           <el-input v-model="ruleForm.desc" type="textarea" maxlength="30" />
         </el-form-item>
         <el-form-item label="价格" prop="price">
@@ -36,7 +36,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="关联疾病">
+        <el-form-item label="关联疾病" prop="illnesses">
           <el-select
             v-model="ruleForm.illnesses"
             multiple

@@ -13,7 +13,7 @@
         <el-form-item label="昵称" prop="name">
           <el-input v-model="ruleForm.name" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item label="描述" prop="desc">
           <el-input v-model="ruleForm.desc" type="textarea" maxlength="30" />
         </el-form-item>
         <el-form-item label="价格" prop="price">
@@ -36,7 +36,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="关联疾病">
+        <el-form-item label="关联疾病" prop="illnesses">
           <el-select
             v-model="ruleForm.illnesses"
             multiple
@@ -51,7 +51,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="图像">
+        <el-form-item label="图像" prop="image">
           <el-upload
             v-model:file-list="fileList"
             :action="uploadAction"
@@ -223,6 +223,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       message("添加失败", { type: "error" });
     }
   });
+  formEl.resetFields();
   drugAddDialog.value = false;
 };
 
