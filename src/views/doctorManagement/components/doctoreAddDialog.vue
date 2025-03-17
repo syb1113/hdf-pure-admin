@@ -3,13 +3,13 @@
     <el-dialog
       v-model="doctoreAddVisible"
       title="添加医生"
-      width="600"
+      width="800"
       :show-close="false"
     >
       <el-form
         ref="ruleFormRef"
         :model="form"
-        style="max-width: 600px"
+        style="max-width: 800px"
         :rules="rules"
       >
         <el-form-item
@@ -92,26 +92,45 @@
           />
         </el-form-item>
         <el-form-item
-          label="医生特长"
+          label="医生标签"
           :label-width="formLabelWidth"
           prop="tags"
         >
-          <el-input
+          <el-select
+            v-model="form.tags"
+            placeholder="医生标签"
+            multiple
+            filterable
+            clearable
+            collapse-tags
+            collapse-tags-tooltip
+            :max-collapse-tags="3"
+          >
+            <el-option
+              v-for="i in docTagsList"
+              :key="i.id"
+              :label="i.name"
+              :value="i.name"
+            />
+          </el-select>
+          <!-- <el-input
             v-model="form.tags"
             clearable
             placeholder="请输入医生特长(用逗号隔开)"
-          />
+          /> -->
         </el-form-item>
         <el-form-item
           label="医生详情介绍"
           :label-width="formLabelWidth"
           prop="content"
         >
-          <el-input
+          <Editor ref="editorRef" v-model="form.content" :disabled="false" />
+
+          <!-- <el-input
             v-model="form.content"
             clearable
             placeholder="请输入医生详情介绍"
-          />
+          /> -->
         </el-form-item>
         <el-form-item
           label="医生头像上传"
@@ -124,6 +143,8 @@
             list-type="picture-card"
             :on-preview="handlePictureCardPreview"
             :on-success="handleUploadSuccess"
+            :on-exceed="onExceed"
+            :limit="1"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
@@ -145,7 +166,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, defineEmits } from "vue";
+import { ref, onMounted, reactive, defineEmits, onBeforeUnmount } from "vue";
 const { VITE_BASE_URL } = import.meta.env;
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
@@ -157,28 +178,40 @@ import {
   requestHospitalIdList,
   requestDoctoresAdd
 } from "@/api/doctorManagement";
+import { requsestDoctorTags } from "@/api/hospitalManagement";
+import Editor from "@/components/Editor/index.vue";
 
 interface RuleForm {
   name: string;
   desc: string;
-  tags: string;
+  tags: string | string[];
   content: string;
   doctorTitleId: string; //职称id
   departmentId: string; //科室id
   hospitalId: string; //医院id
   avatar: string;
 }
+
+const editorRef = ref(null);
 const doctoreAddVisible = defineModel<boolean>();
 const formLabelWidth = "140px";
 const DoctorTitleIdList = ref([]);
 const DepartmentIdList = ref([]);
 const HospitalIdList = ref([]);
+const docTagsList = ref([]);
 const uploadAction = VITE_BASE_URL + "/common/upload";
 const ruleFormRef = ref<FormInstance>();
+
+onBeforeUnmount(() => {
+  const editor = editorRef.value;
+  if (editor == null) return;
+  editor.destroy();
+});
 onMounted(() => {
   getDoctorTitleIdList();
   getDepartmentIdList();
   getHospitalIdList();
+  getDocTagsList();
 });
 const fileList = ref<UploadUserFile[]>([]);
 const emit = defineEmits<{
@@ -186,7 +219,10 @@ const emit = defineEmits<{
 }>();
 const dialogImageUrl = ref("");
 const dialogVisible = ref(false);
-
+const onExceed = () => {
+  ElMessage.error("最多上传一张图片");
+  return;
+};
 const handlePictureCardPreview: UploadProps["onPreview"] = uploadFile => {
   dialogImageUrl.value = uploadFile.url!;
   dialogVisible.value = true;
@@ -213,6 +249,15 @@ const form = ref<RuleForm>({
   hospitalId: "", //医院id
   avatar: ""
 });
+const getDocTagsList = () => {
+  requsestDoctorTags().then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docTagsList.value = data.list;
+      console.log(docTagsList.value);
+    }
+  });
+};
 
 const getDoctorTitleIdList = () => {
   requestDoctorTitleIdList().then((res: any) => {
@@ -312,6 +357,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log("submit!");
+      form.value.tags = (form.value.tags as string[]).join();
       requestDoctoresAdd(form.value).then((res: any) => {
         const { success, errorMessage } = res;
         console.log(res);

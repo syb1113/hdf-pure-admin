@@ -96,7 +96,7 @@
             clearable
             placeholder="请输入医院详情介绍"
           /> -->
-          <Editor ref="editorRef" v-model="form.content" />
+          <Editor ref="editorRef" v-model="form.content" :disabled="disabled" />
         </el-form-item>
         <!-- <el-form-item
           label="医院图像上传"

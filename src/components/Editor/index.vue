@@ -7,6 +7,7 @@
       mode="simple"
     />
     <Editor
+      ref="editor"
       v-model="valueHtml"
       style="height: 300px; overflow-y: hidden"
       :defaultConfig="editorConfig"
@@ -17,25 +18,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, onBeforeUnmount, defineExpose } from "vue";
+import { ref, shallowRef, onBeforeUnmount, defineExpose, watch } from "vue";
 import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 const { VITE_BASE_URL } = import.meta.env;
 import { getToken } from "@/utils/auth";
 type InsertFnType = (url: string) => void;
-
+const { disabled } = defineProps<{
+  disabled: boolean;
+}>();
 onBeforeUnmount(() => {
   const editor = editorRef.value;
   if (editor == null) return;
   editor.destroy();
 });
-
 const editorRef = shallowRef();
 const valueHtml = defineModel<string>();
 const toolbarConfig = {};
 const editorConfig = { placeholder: "请输入内容...", MENU_CONF: {} };
 const handleCreated = editor => {
   editorRef.value = editor; // 记录 editor 实例，重要！
+  if (disabled) {
+    editorRef.value.disable();
+  }
 };
 const token = getToken();
 editorConfig.MENU_CONF["uploadImage"] = {

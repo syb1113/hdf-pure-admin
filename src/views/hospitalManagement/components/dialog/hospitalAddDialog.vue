@@ -80,6 +80,8 @@
             list-type="picture-card"
             :on-preview="handlePictureCardPreview"
             :on-success="handleUploadSuccess"
+            :on-exceed="onExceed"
+            :limit="1"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
@@ -99,7 +101,7 @@
             clearable
             placeholder="请输入医院详情介绍"
           /> -->
-          <Editor ref="editorRef" v-model="form.content" />
+          <Editor ref="editorRef" v-model="form.content" :disabled="false" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -159,6 +161,11 @@ const handleGetAdress = (data: any) => {
 const handleGetAdressInfo = (data: any) => {
   console.log(data);
   form.value.addressInfo = data.addressInfo;
+};
+
+const onExceed = () => {
+  ElMessage.error("最多上传一张图片");
+  return;
 };
 
 const handlePictureCardPreview: UploadProps["onPreview"] = uploadFile => {

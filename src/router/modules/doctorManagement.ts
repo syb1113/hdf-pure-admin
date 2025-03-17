@@ -15,7 +15,8 @@ export default {
       name: "doctorList",
       component: () => import("@/views/doctorManagement/doctorList.vue"),
       meta: {
-        title: $t("menus.pureDoctorList")
+        title: $t("menus.pureDoctorList"),
+        showParent: true
       }
     }
   ]

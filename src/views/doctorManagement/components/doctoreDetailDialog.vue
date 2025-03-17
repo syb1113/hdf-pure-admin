@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-dialog v-model="detailVisible" title="医生详情" width="500">
-      <el-form ref="ruleFormRef" style="max-width: 600px">
+    <el-dialog v-model="detailVisible" title="医生详情" width="800">
+      <el-form ref="ruleFormRef" style="max-width: 800px">
         <el-form-item
           label="医生名称"
           :label-width="formLabelWidth"
@@ -91,24 +91,37 @@
           :label-width="formLabelWidth"
           prop="tags"
         >
-          <el-input
+          <el-select
             v-model="form.tags"
+            placeholder="医生标签"
+            multiple
+            filterable
             clearable
-            placeholder="请输入医生特长(用逗号隔开)"
+            collapse-tags
+            collapse-tags-tooltip
+            :max-collapse-tags="3"
             :disabled="disabled"
-          />
+          >
+            <el-option
+              v-for="i in docTagsList"
+              :key="i.id"
+              :label="i.name"
+              :value="i.name"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item
           label="医生详情介绍"
           :label-width="formLabelWidth"
           prop="content"
         >
-          <el-input
+          <Editor ref="editorRef" v-model="form.content" :disabled="disabled" />
+          <!-- <el-input
             v-model="form.content"
             clearable
             placeholder="请输入医生详情介绍"
             :disabled="disabled"
-          />
+          /> -->
         </el-form-item>
       </el-form>
       <template #footer>
@@ -122,7 +135,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onBeforeUnmount } from "vue";
 // import { delObjectProperty } from "@pureadmin/utils";
 import {
   requestDoctorTitleIdList,
@@ -130,12 +143,14 @@ import {
   requestHospitalIdList,
   requestDoctorModify
 } from "@/api/doctorManagement";
+import { requsestDoctorTags } from "@/api/hospitalManagement";
+import Editor from "@/components/Editor/index.vue";
 
 interface RuleForm {
   id: string;
   name: string;
   desc: string;
-  tags: string;
+  tags: string | string[];
   content: string;
   doctorTitleId: string; //职称id
   departmentId: string; //科室id
@@ -145,12 +160,12 @@ interface RuleForm {
 
 const formLabelWidth = "140px";
 const detailVisible = defineModel<boolean>();
-const props = defineProps<{
+const { doctorDetails, disabled } = defineProps<{
   doctorDetails: RuleForm;
   disabled: boolean;
 }>();
 const form = ref<RuleForm>({
-  ...props.doctorDetails
+  ...doctorDetails
 });
 const emit = defineEmits<{
   (event: "getData"): void;
@@ -158,23 +173,32 @@ const emit = defineEmits<{
 const DoctorTitleIdList = ref([]);
 const DepartmentIdList = ref([]);
 const HospitalIdList = ref([]);
+const docTagsList = ref([]);
+const editorRef = ref(null);
 
 watch(
-  () => props.doctorDetails,
+  () => doctorDetails,
   newVal => {
-    form.value = { ...newVal };
+    const tags = (doctorDetails.tags as string).split(",");
+    form.value = { ...newVal, tags: tags };
   },
-  { deep: true, immediate: true }
+  { deep: true }
 );
 
+onBeforeUnmount(() => {
+  const editor = editorRef.value;
+  if (editor == null) return;
+  editor.destroy();
+});
 onMounted(() => {
   getDoctorTitleIdList();
   getDepartmentIdList();
   getHospitalIdList();
+  getDocTagsList();
 });
-
 const updataDoctor = async () => {
   console.log("form", form.value);
+  form.value.tags = (form.value.tags as string[]).join();
   const data = {};
   for (const key in form.value) {
     if (key === "id" || key === "createdAt" || key === "updatedAt") {
@@ -182,7 +206,6 @@ const updataDoctor = async () => {
     }
     data[key] = form.value[key];
   }
-  // const data = delObjectProperty(form.value, ["id", "createdAt", "updatedAt"]);
   await requestDoctorModify(form.value.id, data).then((res: any) => {
     const { success } = res;
     if (success) {
@@ -190,6 +213,16 @@ const updataDoctor = async () => {
     }
   });
   emit("getData");
+};
+
+const getDocTagsList = () => {
+  requsestDoctorTags().then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      docTagsList.value = data.list;
+      console.log(docTagsList.value);
+    }
+  });
 };
 
 const getDoctorTitleIdList = () => {

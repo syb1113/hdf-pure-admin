@@ -1,3 +1,117 @@
+<template>
+  <div>
+    <div class="root">
+      <el-card shadow="always">
+        <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
+          >添加医生</el-button
+        >
+        <el-button type="primary" @click="exportExcel">导出Excel</el-button>
+        <div class="mt-3">
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column fixed="left" type="index" label="#" width="100" />
+            <el-table-column prop="name" label="医生名字" min-width="120" />
+            <el-table-column prop="desc" label="医生简介" min-width="200" />
+            <el-table-column prop="tags" label="医生特长" min-width="120">
+              <template #default="{ row }">
+                <el-tag
+                  v-for="i in splitTags(row.tags)"
+                  :key="i"
+                  type="success"
+                  >{{ i }}</el-tag
+                >
+              </template>
+            </el-table-column>
+            <!-- <el-table-column prop="content" label="医生描述" min-width="160" /> -->
+            <el-table-column prop="avatar" label="证件照" width="120">
+              <template #default="{ row }">
+                <el-avatar
+                  shape="square"
+                  :size="50"
+                  :src="row.avatar ? VITE_BASE_URL + row.avatar : doctorAvatar"
+                />
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="departmentInfoName"
+              label="所属部门"
+              width="120"
+            >
+              <template #default="{ row }">
+                <el-text class="mx-1">{{
+                  row.departmentInfo.name ? row.departmentInfo.name : "-"
+                }}</el-text>
+              </template> </el-table-column
+            ><el-table-column
+              prop="doctorTitleInfoName"
+              label="医生职位"
+              width="120"
+            >
+              <template #default="{ row }">
+                <el-text class="mx-1">{{
+                  row.doctorTitleInfo.name ? row.doctorTitleInfo.name : "-"
+                }}</el-text>
+              </template> </el-table-column
+            ><el-table-column
+              prop="hospitalInfoName"
+              label="所属医院"
+              min-width="200"
+            >
+              <template #default="{ row }">
+                <el-text class="mx-1">{{
+                  row.hospitalInfo.name ? row.hospitalInfo.name : "-"
+                }}</el-text>
+              </template>
+            </el-table-column>
+            <el-table-column prop="phone" label="医院电话" width="120">
+              <template #default="{ row }">
+                <el-text class="mx-1">{{
+                  row.hospitalInfo.phone ? row.hospitalInfo.phone : "-"
+                }}</el-text>
+              </template>
+            </el-table-column>
+            <el-table-column prop="address" label="医院地址" min-width="200">
+              <template #default="{ row }">
+                <el-text class="mx-1">{{
+                  row.hospitalInfo.address ? row.hospitalInfo.address : "-"
+                }}</el-text>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="操作" min-width="200">
+              <template #default="{ row }">
+                <el-button type="primary" size="small" @click="handleClick(row)"
+                  >详情</el-button
+                >
+                <el-button size="small" @click="updataDoctor(row)"
+                  >修改</el-button
+                >
+                <el-button type="danger" size="small" @click="delDoctor(row)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div class="flex justify-end mt-3">
+          <el-pagination
+            v-model:current-page="currentPage"
+            :page-size="pages.per"
+            layout="total, prev, pager, next"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+        <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
+        <doctoreDetailDialog
+          v-model="doctoreDetailVisible"
+          :doctorDetails="doctorDetails"
+          :disabled="disabled"
+          @getData="getData"
+        />
+      </el-card>
+    </div>
+  </div>
+</template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { utils, writeFile } from "xlsx";
@@ -184,108 +298,6 @@ const requestDoctoreAdd = () => {
 };
 </script>
 
-<template>
-  <div class="root">
-    <el-card shadow="always">
-      <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
-        >添加医生</el-button
-      >
-      <el-button type="primary" @click="exportExcel">导出Excel</el-button>
-      <div class="mt-3">
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column fixed="left" type="index" label="#" width="100" />
-          <el-table-column prop="name" label="医生名字" min-width="120" />
-          <el-table-column prop="desc" label="医生简介" min-width="200" />
-          <el-table-column prop="tags" label="医生特长" min-width="120">
-            <template #default="{ row }">
-              <el-tag
-                v-for="i in splitTags(row.tags)"
-                :key="i"
-                type="success"
-                >{{ i }}</el-tag
-              >
-            </template>
-          </el-table-column>
-          <el-table-column prop="content" label="医生描述" min-width="160" />
-          <el-table-column prop="avatar" label="证件照" width="120">
-            <template #default="{ row }">
-              <el-avatar
-                shape="square"
-                :size="50"
-                :src="row.avatar ? VITE_BASE_URL + row.avatar : doctorAvatar"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="departmentInfoName"
-            label="所属部门"
-            width="120"
-          >
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.departmentInfo.name }}</el-text>
-            </template> </el-table-column
-          ><el-table-column
-            prop="doctorTitleInfoName"
-            label="医生职位"
-            width="120"
-          >
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.doctorTitleInfo.name }}</el-text>
-            </template> </el-table-column
-          ><el-table-column
-            prop="hospitalInfoName"
-            label="所属医院"
-            min-width="200"
-          >
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.hospitalInfo.name }}</el-text>
-            </template>
-          </el-table-column>
-          <el-table-column prop="phone" label="医院电话" width="120">
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.hospitalInfo.phone }}</el-text>
-            </template>
-          </el-table-column>
-          <el-table-column prop="address" label="医院地址" min-width="200">
-            <template #default="{ row }">
-              <el-text class="mx-1">{{ row.hospitalInfo.address }}</el-text>
-            </template>
-          </el-table-column>
-          <el-table-column fixed="right" label="操作" min-width="200">
-            <template #default="{ row }">
-              <el-button type="primary" size="small" @click="handleClick(row)"
-                >详情</el-button
-              >
-              <el-button size="small" @click="updataDoctor(row)"
-                >修改</el-button
-              >
-              <el-button type="danger" size="small" @click="delDoctor(row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="flex justify-end mt-3">
-        <el-pagination
-          v-model:current-page="currentPage"
-          :page-size="pages.per"
-          layout="total, prev, pager, next"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-      <doctoreAddDialog v-model="doctoreAddVisible" @getData="getData" />
-      <doctoreDetailDialog
-        v-model="doctoreDetailVisible"
-        :doctorDetails="doctorDetails"
-        :disabled="disabled"
-        @getData="getData"
-      />
-    </el-card>
-  </div>
-</template>
 <style lang="scss" scoped>
 .root {
   margin: 10px;
