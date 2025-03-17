@@ -11,15 +11,6 @@ export default {
   },
   children: [
     {
-      path: "/drugAndDiseaseManagement/drugManagement",
-      name: "drugManagement",
-      component: () =>
-        import("@/views/DrugAndDiseaseaManagement/drugManagement.vue"),
-      meta: {
-        title: $t("menus.pureDrugManage")
-      }
-    },
-    {
       path: "/drugAndDiseaseManagement/drugTypeManagement",
       name: "drugTypeManagement",
       component: () =>
@@ -29,12 +20,30 @@ export default {
       }
     },
     {
+      path: "/drugAndDiseaseManagement/drugManagement",
+      name: "drugManagement",
+      component: () =>
+        import("@/views/DrugAndDiseaseaManagement/drugManagement.vue"),
+      meta: {
+        title: $t("menus.pureDrugManage")
+      }
+    },
+    {
       path: "/drugAndDiseaseManagement/diseaseTypeManage",
       name: "diseaseTypeManage",
       component: () =>
         import("@/views/DrugAndDiseaseaManagement/diseaseTypeManage.vue"),
       meta: {
         title: $t("menus.pureDisType")
+      }
+    },
+    {
+      path: "/drugAndDiseaseManagement/diseaseaManage",
+      name: "diseaseaManage",
+      component: () =>
+        import("@/views/DrugAndDiseaseaManagement/diseaseaManage.vue"),
+      meta: {
+        title: $t("menus.pureDisManage")
       }
     }
   ]
