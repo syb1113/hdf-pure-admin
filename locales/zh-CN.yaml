@@ -76,6 +76,9 @@ menus:
   pureDrugType: 药品分类
   pureDisManage: 疾病信息
   pureDisType: 疾病分类
+  pureAticleManage: 文章管理
+  pureAticleType: 文章分类
+  pureAticleList: 文章列表
   pureDoctorAdd: 添加医生
   pureHospitalDetails: 医院详情
   pureLogin: 登录
