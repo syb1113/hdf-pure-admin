@@ -1,5 +1,8 @@
 <template>
   <div>
+    <el-button class="mb-3" :icon="Plus" type="primary" @click="addArticles"
+      >新增文章</el-button
+    >
     <el-table :data="tableData">
       <el-table-column
         fixed="left"
@@ -8,8 +11,20 @@
         label="#"
         center
       />
-      <el-table-column prop="name" label="药物名称" align="center" />
-      <el-table-column prop="image" label="照片" align="center" width="100">
+      <el-table-column prop="name" label="文章名称" align="center" />
+      <el-table-column
+        prop="desc"
+        label="详情"
+        align="center"
+        show-overflow-tooltip
+        min-width="120"
+      />
+      <el-table-column prop="views" align="center" label="浏览量">
+        <template #default="{ row }">
+          <div>{{ formatNumber(row.views) }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="image" label="主图" align="center" width="100">
         <template #default="{ row }">
           <el-avatar
             shape="square"
@@ -18,50 +33,39 @@
           />
         </template>
       </el-table-column>
+      <el-table-column prop="category" align="center" label="文章类型">
+        <template #default="{ row }">
+          <div>{{ row.category ? row.category.name : "-" }}</div>
+        </template>
+      </el-table-column>
       <el-table-column
-        prop="desc"
-        label="描述"
+        prop="createdAt"
         align="center"
-        show-overflow-tooltip
-        min-width="160"
-      />
-      <el-table-column prop="price" label="价格" align="center" width="100">
+        label="文章创建时间"
+        min-width="120"
+      >
         <template #default="{ row }">
-          <div>{{ row.price }}￥</div>
+          <div>{{ formatDate(row.createdAt) }}</div>
         </template>
       </el-table-column>
-      <el-table-column prop="amount" label="库存" align="center" width="100">
+      <el-table-column
+        prop="updatedAt"
+        align="center"
+        label="文章修改时间"
+        min-width="120"
+      >
         <template #default="{ row }">
-          <el-text :type="row.amount <= 50 ? 'danger' : ''"
-            >{{ row.amount }}件</el-text
-          >
+          <div>{{ formatDate(row.updatedAt) }}</div>
         </template>
       </el-table-column>
-      <el-table-column prop="category" align="center" label="药物类型">
-        <template #default="{ row }">
-          <div>{{ row.category.name }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column label="关联疾病" align="center" min-width="100">
-        <template #default="{ row }">
-          <div>
-            <el-tag
-              v-for="item in row.illnessMedicine"
-              :key="item.id"
-              class="mr-1"
-              type="success"
-              >{{ item ? item.illness.name : "-" }}</el-tag
-            >
-          </div>
-        </template>
-      </el-table-column>
+
       <el-table-column fixed="right" align="center" label="操作">
         <template #default="{ row }">
           <el-button
             type="danger"
             :icon="Delete"
             size="small"
-            @click="delDrug(row.id)"
+            @click="delArticle(row.id)"
           >
             删除
           </el-button>
@@ -70,7 +74,7 @@
             :icon="Edit"
             plain
             size="small"
-            @click="upDrugDetails(row.id)"
+            @click="upArticleDetails(row.id)"
             >修改</el-button
           >
         </template>
@@ -87,39 +91,36 @@
         @current-change="handleCurrentChange"
       />
     </div>
-
-    <DrugDetailsUp :id="drugId" v-model="drugDialogVisible" />
+    <ArticleDialog v-model="articleDialog" :articleId="articleId" />
   </div>
 </template>
 <script setup lang="ts">
 import { Edit, Delete } from "@element-plus/icons-vue";
-import { requestOneDrug, requsestDelDrug } from "@/api/drugManage";
+import { requestDelArticle } from "@/api/articleManage";
 import { message } from "@/utils/message";
 import { ref, onMounted, computed, watch } from "vue";
-import DrugDetailsUp from "../Dialog/DrugDetailsUp.vue";
+import DiseaseDialog from "../Dialog/DiseaseDialog.vue";
+import { Plus } from "@element-plus/icons-vue";
+import ArticleDialog from "../Dialog/ArticleDialog.vue";
+import { formatNumber } from "@/utils/utils";
+import dayjs from "dayjs";
 const { VITE_BASE_URL } = import.meta.env;
 
 interface TableData {
   id: string;
   name: string;
   desc: string;
-  price: number;
-  amount: number;
   image?: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
   category: {
     name: string;
   };
-  illnessMedicine: [
-    {
-      illness: {
-        name: string;
-      };
-    }
-  ];
 }
-const drugDialogVisible = ref(false);
+const articleDialog = ref(false);
 watch(
-  () => drugDialogVisible.value,
+  () => articleDialog.value,
   newVal => {
     // 对话框关闭时获取数据
     emit("getData");
@@ -149,21 +150,29 @@ const handleCurrentChange = (val: number) => {
   emit("updatePage", currentPage.value, pageSize.value);
 };
 
-const drugId = ref();
-
-const upDrugDetails = async (id: string) => {
-  drugId.value = id;
-  drugDialogVisible.value = true;
+const articleId = ref();
+const upArticleDetails = async (id: string) => {
+  articleId.value = id;
+  articleDialog.value = true;
 };
 
-const delDrug = async (id: string) => {
-  const res = await requsestDelDrug(id);
+const addArticles = () => {
+  articleId.value = "";
+  articleDialog.value = true;
+};
+
+const delArticle = async (id: string) => {
+  const res = await requestDelArticle(id);
   if (res.success) {
     message("删除成功", { type: "success" });
     emit("getData");
   } else {
     message("删除失败", { type: "error" });
   }
+};
+
+const formatDate = (date: string) => {
+  return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
 };
 </script>
 <style lang="scss" scoped></style>

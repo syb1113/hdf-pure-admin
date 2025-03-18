@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-dialog
-      v-model="diseaseaAddDialog"
-      :title="!diseaseaId ? '疾病添加' : '疾病详情'"
+      v-model="articleDialog"
+      :title="!articleId ? '文章添加' : '文章修改'"
       width="800"
       center
     >
@@ -15,14 +15,14 @@
         class="demo-ruleForm"
         status-icon
       >
-        <el-form-item label="昵称" prop="name">
+        <el-form-item label="文章昵称" prop="name">
           <el-input
             v-model="ruleForm.name"
             :disabled="disabled"
             placeholder="请输入昵称"
           />
         </el-form-item>
-        <el-form-item label="描述" prop="desc">
+        <el-form-item label="文章描述" prop="desc">
           <el-input
             v-model="ruleForm.desc"
             type="textarea"
@@ -31,10 +31,17 @@
             placeholder="请描述该疾病"
           />
         </el-form-item>
-        <el-form-item label="疾病类型" prop="illnessCategoryId">
+        <el-form-item label="文章浏览量" prop="views">
+          <el-input
+            v-model="ruleForm.views"
+            :disabled="disabled"
+            placeholder="请输入文章浏览量"
+          />
+        </el-form-item>
+        <el-form-item label="文章类型" prop="articleCategoryId">
           <el-select
-            v-model="ruleForm.illnessCategoryId"
-            placeholder="请输入关键词(名称)"
+            v-model="ruleForm.articleCategoryId"
+            placeholder="请选择文章类型"
             filterable
             :disabled="disabled"
           >
@@ -64,12 +71,7 @@
             <img :src="dialogImageUrl" alt="Preview Image" />
           </el-dialog>
         </el-form-item>
-        <el-form-item label="疾病详情介绍" prop="content">
-          <!-- <el-input
-            v-model="form.content"
-            clearable
-            placeholder="请输入医院详情介绍"
-          /> -->
+        <el-form-item label="文章详情" prop="content">
           <Editor
             ref="editorRef"
             v-model="ruleForm.content"
@@ -88,24 +90,25 @@
 </template>
 <script setup lang="ts">
 import { message } from "@/utils/message";
-import { reactive, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { reactive, ref, watch, onMounted } from "vue";
 import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import {
-  requestDiseaseTypeList,
-  requestAddDisease,
-  requestOneDisease,
-  requestEditDisease
-} from "@/api/diseaseManage";
+  requestArticlesTypeList,
+  requestAddArticle,
+  requestArticlesDetails,
+  requestUpArticle
+} from "@/api/articleManage";
 import Editor from "@/components/Editor/index.vue";
 interface RuleForm {
   id?: string;
   name: string;
   desc: string;
+  views: string;
   image: string;
-  illnessCategoryId: string;
+  articleCategoryId: string;
   content: string;
 }
 
@@ -116,30 +119,21 @@ const dialogVisible = ref(false);
 const fileList = ref([]);
 const ruleFormRef = ref<FormInstance>();
 const categoryList = ref([]);
-const diseaseaAddDialog = defineModel<boolean>();
+const articleDialog = defineModel<boolean>();
 const ruleForm = ref<RuleForm>({
   name: "",
   desc: "",
+  views: "",
   image: "",
-  illnessCategoryId: "",
+  articleCategoryId: "",
   content: ""
 });
-
-onBeforeUnmount(() => {
-  ruleForm.value = {
-    name: "",
-    desc: "",
-    image: "",
-    illnessCategoryId: "",
-    content: ""
-  };
-});
 watch(
-  () => diseaseaAddDialog,
+  () => articleDialog,
   newVal => {
     if (newVal) {
-      getDiseaseTypeList();
-      getOneDisDetails(diseaseaId);
+      getArticlesTypeList();
+      getOneArticles(articleId);
     }
   },
   { deep: true }
@@ -155,26 +149,25 @@ watch(
   }
 );
 interface definePropsData {
-  disabled: boolean;
-  diseaseaId?: string;
+  disabled?: boolean;
+  articleId?: string;
 }
-const { disabled, diseaseaId } = defineProps<definePropsData>();
+const { disabled = false, articleId } = defineProps<definePropsData>();
 
 const emit = defineEmits<{
   (event: "getData"): void;
 }>();
-const getDiseaseTypeList = async () => {
-  await requestDiseaseTypeList().then((res: any) => {
+const getArticlesTypeList = async () => {
+  await requestArticlesTypeList().then((res: any) => {
     const { data, success } = res;
     if (success) {
       categoryList.value = data.list;
-      console.log("categoryList-->", categoryList.value);
     }
   });
 };
 
-const getOneDisDetails = async (id: string) => {
-  await requestOneDisease(id).then((res: any) => {
+const getOneArticles = async (id: string) => {
+  await requestArticlesDetails(id).then((res: any) => {
     const { data, success } = res;
     if (success) {
       ruleForm.value = data;
@@ -184,8 +177,8 @@ const getOneDisDetails = async (id: string) => {
 
 const rules = reactive<FormRules<RuleForm>>({
   name: [{ required: true, message: "请输入昵称", trigger: "blur" }],
-  illnessCategoryId: [
-    { required: true, message: "请选择疾病类型", trigger: "change" }
+  articleCategoryId: [
+    { required: true, message: "请选择文章类型", trigger: "change" }
   ]
 });
 
@@ -212,24 +205,23 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      if (!diseaseaId) {
-        requestAddDisease(ruleForm.value).then(res => {
+      const data = {
+        name: ruleForm.value.name,
+        desc: ruleForm.value.desc,
+        image: ruleForm.value.image,
+        views: ruleForm.value.views,
+        content: ruleForm.value.content,
+        articleCategoryId: ruleForm.value.articleCategoryId
+      };
+      if (!articleId) {
+        requestAddArticle(data).then(res => {
           const { success } = res;
           if (success) {
             message("添加成功", { type: "success" });
           }
         });
       } else {
-        const data = {
-          name: ruleForm.value.name,
-          desc: ruleForm.value.desc,
-          image: ruleForm.value.image,
-          content: ruleForm.value.content,
-          illnessCategoryId: ruleForm.value.illnessCategoryId
-        };
-        console.log("data-->", data);
-
-        requestEditDisease(diseaseaId, data).then(res => {
+        requestUpArticle(data, articleId).then(res => {
           const { success } = res;
           if (success) {
             message("修改成功", { type: "success" });
@@ -237,20 +229,20 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         });
       }
     } else {
-      message(!diseaseaId ? "添加失败" : "修改失败", { type: "error" });
+      message(!articleId ? "添加失败" : "修改失败", { type: "error" });
     }
   });
   formEl.resetFields();
   await emit("getData");
-  diseaseaAddDialog.value = false;
+  articleDialog.value = false;
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
-  message(!diseaseaId ? "你已取消添加" : "你已取消修改", { type: "info" });
+  message(!articleId ? "你已取消添加" : "你已取消修改", { type: "info" });
   fileList.value.length = 0;
-  diseaseaAddDialog.value = false;
+  articleDialog.value = false;
 };
 </script>
 <style lang="scss" scoped></style>

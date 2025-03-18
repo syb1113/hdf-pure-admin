@@ -82,15 +82,20 @@ export const useUserStore = defineStore("pure-user", {
       return new Promise<UserResult>((resolve, reject) => {
         getLogin(data)
           .then((res: any) => {
+            // console.log("loginData-->", data);
             const result = {
               accessToken: res.data,
               avatar:
                 VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg",
               expires: new Date("2030/10/30 00:00:00"),
               nickname: data.userName,
-              permissions: ["*:*:*"],
+              permissions:
+                data.userName == "admin"
+                  ? ["*:*:*"]
+                  : ["permission:btn:add", "permission:btn:edit"],
               refreshToken: res.data,
-              roles: data.username == "admin" ? ["admin"] : ["admin", "common"],
+              roles:
+                data.userName == "admin" ? ["admin", "common"] : ["common"],
               username: data.userName,
               userId: data.userId
             };
