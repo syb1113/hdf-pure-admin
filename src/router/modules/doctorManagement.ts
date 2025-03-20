@@ -16,6 +16,7 @@ export default {
       component: () => import("@/views/doctorManagement/doctorList.vue"),
       meta: {
         title: $t("menus.pureDoctorList"),
+        roles: ["admin", "common"],
         showParent: true
       }
     }

@@ -16,8 +16,7 @@ export default {
       component: () => import("@/views/ArticlesManagement/articleType.vue"),
       meta: {
         title: $t("menus.pureAticleType"),
-        // roles: ["common"],
-        showParent: true
+        roles: ["admin", "common"]
       }
     },
     {
@@ -26,7 +25,7 @@ export default {
       component: () => import("@/views/ArticlesManagement/articlesList.vue"),
       meta: {
         title: $t("menus.pureAticleList"),
-        showParent: true
+        roles: ["admin", "common"]
       }
     }
   ]

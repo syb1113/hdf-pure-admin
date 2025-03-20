@@ -79,6 +79,14 @@ menus:
   pureAticleManage: 文章管理
   pureAticleType: 文章分类
   pureAticleList: 文章列表
+  pureUserManage: 用户管理
+  pureUserList: 用户信息
+  pureUserCart: 用户购物车
+  pureUserOrer: 用户订单
+  pureSystemManage: 系统管理
+  pureRoleInformation: 角色管理
+  pureAdminList: 管理员信息
+  purePermissionManage: 权限管理
   pureDoctorAdd: 添加医生
   pureHospitalDetails: 医院详情
   pureLogin: 登录
