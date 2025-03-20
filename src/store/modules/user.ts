@@ -18,6 +18,19 @@ import {
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
+const roleKeywords = {
+  admin: ["*:*:*"],
+  common: ["permission:btn:add", "permission:btn:edit"],
+  user: []
+};
+
+function getPermissions(role: string): string[] {
+  for (const [keyword, permissions] of Object.entries(roleKeywords)) {
+    if (role.includes(keyword)) {
+      return permissions;
+    }
+  }
+}
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
     // 头像
@@ -89,10 +102,7 @@ export const useUserStore = defineStore("pure-user", {
                 VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg",
               expires: new Date("2030/10/30 00:00:00"),
               nickname: data.userName,
-              permissions:
-                data.userName == "admin"
-                  ? ["*:*:*"]
-                  : ["permission:btn:add", "permission:btn:edit"],
+              permissions: getPermissions(data.userName),
               refreshToken: res.data,
               roles: data.userName == "admin" ? ["admin"] : ["common"],
               username: data.userName,
