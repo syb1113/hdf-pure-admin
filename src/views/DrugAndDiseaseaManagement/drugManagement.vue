@@ -2,7 +2,12 @@
   <div>
     <SearchBar :options-lit="tableData" @search="searchData" />
     <el-card>
-      <el-button class="mb-3" :icon="Plus" type="primary" @click="drugAdd"
+      <el-button
+        v-if="hasPerms('permission:btn:add')"
+        class="mb-3"
+        :icon="Plus"
+        type="primary"
+        @click="drugAdd"
         >新增药品</el-button
       >
       <DrugTableComp
@@ -17,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+import { hasPerms } from "@/utils/auth";
 import SearchBar from "@/views/components/SearchBar/index.vue";
 import DrugTableComp from "./components/Table/DrugTableComp.vue";
 import { ref, onMounted } from "vue";

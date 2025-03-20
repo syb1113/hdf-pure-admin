@@ -2,7 +2,11 @@
   <div>
     <div class="root">
       <el-card shadow="always">
-        <el-button :icon="Plus" type="primary" @click="requestDoctoreAdd"
+        <el-button
+          v-if="hasPerms('permission:btn:add')"
+          :icon="Plus"
+          type="primary"
+          @click="requestDoctoreAdd"
           >添加医生</el-button
         >
         <el-button type="primary" @click="exportExcel">导出Excel</el-button>
@@ -81,10 +85,23 @@
                 <el-button type="primary" size="small" @click="handleClick(row)"
                   >详情</el-button
                 >
-                <el-button size="small" @click="updataDoctor(row)"
+                <el-button
+                  v-if="hasPerms('permission:btn:edit')"
+                  size="small"
+                  @click="updataDoctor(row)"
                   >修改</el-button
                 >
-                <el-button type="danger" size="small" @click="delDoctor(row)"
+                <el-button
+                  v-if="
+                    hasPerms([
+                      'permission:btn:add',
+                      'permission:btn:edit',
+                      'permission:btn:delete'
+                    ])
+                  "
+                  type="danger"
+                  size="small"
+                  @click="delDoctor(row)"
                   >删除</el-button
                 >
               </template>
@@ -113,6 +130,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { hasPerms } from "@/utils/auth";
 import { ref, onMounted } from "vue";
 import { utils, writeFile } from "xlsx";
 import { requestDoctoresList } from "@/api/doctorManagement";

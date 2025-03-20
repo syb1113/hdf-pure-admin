@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button
-      v-if="hasPerms(['permission:btn:add'])"
+      v-if="hasPerms('permission:btn:add')"
       class="mb-3"
       :icon="Plus"
       type="primary"
@@ -39,7 +39,7 @@
             删除
           </el-button>
           <el-button
-            v-if="hasPerms(['permission:btn:edit'])"
+            v-if="hasPerms('permission:btn:edit')"
             type="warning"
             :icon="Edit"
             plain

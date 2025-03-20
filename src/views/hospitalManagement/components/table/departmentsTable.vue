@@ -1,6 +1,11 @@
 <template>
   <div>
-    <el-button class="mb-3" :icon="Plus" type="primary" @click="otherAdd"
+    <el-button
+      v-if="hasPerms('permission:btn:add')"
+      class="mb-3"
+      :icon="Plus"
+      type="primary"
+      @click="otherAdd"
       >新增{{ title }}</el-button
     >
     <el-table :data="tableData">
@@ -20,6 +25,13 @@
       <el-table-column fixed="right" label="操作">
         <template #default="{ row }">
           <el-button
+            v-if="
+              hasPerms([
+                'permission:btn:add',
+                'permission:btn:edit',
+                'permission:btn:delete'
+              ])
+            "
             type="danger"
             :icon="Delete"
             size="small"
@@ -28,6 +40,7 @@
             删除
           </el-button>
           <el-button
+            v-if="hasPerms('permission:btn:edit')"
             type="warning"
             :icon="Edit"
             plain
@@ -58,6 +71,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { hasPerms } from "@/utils/auth";
 import { Edit, Delete } from "@element-plus/icons-vue";
 import {
   requestDocTitleDel,

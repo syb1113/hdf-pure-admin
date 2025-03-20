@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasPerms } from "@/utils/auth";
 import { ref, onMounted, provide, inject } from "vue";
 import { useRouter } from "vue-router";
 import { utils, writeFile } from "xlsx";
@@ -166,7 +167,11 @@ const requestHospitalAdd = () => {
     <SearchBar :options-lit="tableData" @search="searchData" />
 
     <el-card shadow="always">
-      <el-button :icon="Plus" type="primary" @click="requestHospitalAdd"
+      <el-button
+        v-if="hasPerms('permission:btn:add')"
+        :icon="Plus"
+        type="primary"
+        @click="requestHospitalAdd"
         >新增医院</el-button
       >
       <el-button type="primary" @click="exportExcel">导出Excel</el-button>
@@ -196,10 +201,23 @@ const requestHospitalAdd = () => {
               <el-button type="primary" size="small" @click="handleClick(row)"
                 >详情</el-button
               >
-              <el-button size="small" @click="updataHospital(row)"
+              <el-button
+                v-if="hasPerms('permission:btn:edit')"
+                size="small"
+                @click="updataHospital(row)"
                 >修改</el-button
               >
-              <el-button type="danger" size="small" @click="delHospital(row)"
+              <el-button
+                v-if="
+                  hasPerms([
+                    'permission:btn:add',
+                    'permission:btn:edit',
+                    'permission:btn:delete'
+                  ])
+                "
+                type="danger"
+                size="small"
+                @click="delHospital(row)"
                 >删除</el-button
               >
             </template>
