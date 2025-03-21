@@ -6,6 +6,10 @@
       width="600"
       center
     >
+      <el-text class="mx-1" type="danger"
+        >*普通用户用户名必须以 user 开头，普通管理员用户名必须以 common
+        开头，超级管理员用户名必须以 admin 开头</el-text
+      >
       <el-form
         ref="ruleFormRef"
         style="max-width: 400px"
@@ -22,11 +26,16 @@
           <el-input
             v-model="ruleForm.password"
             type="password"
-            placeholder="请输入密码"
+            placeholder="请输入密码（至少6位）"
           />
         </el-form-item>
         <el-form-item label="角色" prop="roleId">
-          <el-select v-model="ruleForm.roleId" clearable placeholder="选择角色">
+          <el-select
+            v-model="ruleForm.roleId"
+            clearable
+            placeholder="选择角色"
+            @change="handleRoleChange"
+          >
             <el-option
               v-for="item in roleList"
               :key="item.id"
@@ -86,10 +95,44 @@ const ruleForm = ref<RuleForm>({
 });
 const roleList = ref([]);
 const rules = reactive<FormRules<RuleForm>>({
-  userName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  userName: [
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    {
+      validator: (_, value, callback) => {
+        const roleId = ruleForm.value.roleId;
+
+        if (!roleId || !value) return callback();
+
+        const selectedRole = roleList.value.find(role => role.id === roleId);
+        if (!selectedRole) {
+          return callback(new Error("未找到对应角色"));
+        }
+
+        const prefix = roleNamePrefixMap[selectedRole.name];
+        if (prefix && !value.startsWith(prefix)) {
+          callback(new Error(`当前角色用户名必须以 ${prefix} 开头`));
+        } else {
+          callback();
+        }
+      },
+      trigger: ["blur", "change"]
+    }
+  ],
+  password: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 6, message: "密码长度不能少于6位", trigger: "blur" }
+  ],
   roleId: [{ required: true, message: "请选择权限", trigger: "blur" }]
 });
+const roleNamePrefixMap = {
+  普通用户: "user",
+  普通管理员: "common",
+  超级管理员: "admin"
+};
+
+const handleRoleChange = () => {
+  ruleFormRef.value?.validateField("userName");
+};
 
 const getroleList = async () => {
   await requestRoleList().then((res: any) => {
