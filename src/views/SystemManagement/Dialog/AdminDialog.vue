@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      v-model="RolesDialogVisible"
+      v-model="AdminDialogVisible"
       :title="add ? '新增角色' : '角色修改'"
       width="600"
       center
@@ -15,25 +15,28 @@
         class="demo-ruleForm"
         status-icon
       >
-        <el-form-item label="昵称" prop="name">
-          <el-input v-model="ruleForm.name" placeholder="请输入昵称" />
+        <el-form-item label="用户名" prop="userName">
+          <el-input v-model="ruleForm.userName" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="描述" prop="desc">
+        <el-form-item label="密码" prop="password">
           <el-input
-            v-model="ruleForm.desc"
-            type="textarea"
-            maxlength="30"
-            placeholder="描述"
+            v-model="ruleForm.password"
+            type="password"
+            placeholder="请输入密码"
           />
         </el-form-item>
-        <el-form-item label="权限" prop="permissions">
-          <el-checkbox-group v-model="checkList"
-            ><el-checkbox
-              v-for="item in permissionsList"
+        <el-form-item label="角色" prop="roleId">
+          <el-select v-model="ruleForm.roleId" clearable placeholder="选择角色">
+            <el-option
+              v-for="item in roleList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
-          /></el-checkbox-group>
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="昵称" prop="nickName">
+          <el-input v-model="ruleForm.nickName" placeholder="请输入昵称" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -51,54 +54,54 @@ import { reactive, ref, watch } from "vue";
 import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import { requestPermissionsList } from "@/api/permissions";
-import { requestRoleModify, requestRoleAdd } from "@/api/role";
-
+import { requestRoleList } from "@/api/role";
+import { requestAdminModify, requestAdminAdd } from "@/api/admin";
 interface RuleForm {
   id?: string;
-  name: string;
-  desc: string;
-  permissions?: string;
-  permissionOnRoles?: PermissinoOnRples[];
+  userName: string;
+  password: string;
+  roleId: string;
+  nickName: string;
+  role: Role;
 }
 
-interface PermissinoOnRples {
+interface Role {
   id: string;
-  roleId: string;
-  permissionId: string;
-}
-interface RequestData {
   name: string;
   desc: string;
-  permissions: string;
+}
+interface RequestData {
+  userName: string;
+  password: string;
+  nickName: string;
+  roleId: string;
 }
 const ruleFormRef = ref<FormInstance>();
-const checkList = ref([]);
-const { rolesDetails, add } = defineProps<{
-  rolesDetails: RuleForm;
+const { adminDetails, add } = defineProps<{
+  adminDetails: RuleForm;
   add: boolean;
 }>();
 const ruleForm = ref<RuleForm>({
-  ...rolesDetails
+  ...adminDetails
 });
+const roleList = ref([]);
 const rules = reactive<FormRules<RuleForm>>({
-  name: [{ required: true, message: "请输入昵称", trigger: "blur" }],
-  permissions: [{ required: true, message: "请选择权限", trigger: "blur" }]
+  userName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  roleId: [{ required: true, message: "请选择权限", trigger: "blur" }]
 });
 
-const permissionsList = ref<RuleForm[]>([]);
-
-const getPermissionsList = async () => {
-  await requestPermissionsList().then((res: any) => {
+const getroleList = async () => {
+  await requestRoleList().then((res: any) => {
     const { data, success } = res;
     if (success) {
-      permissionsList.value = data.list;
+      roleList.value = data.list;
     }
   });
 };
 
-const handleUpRolesDetails = async (data: RequestData, id: string) => {
-  await requestRoleModify(data, id).then((res: any) => {
+const handleUpAdminDetails = async (data: RequestData, id: string) => {
+  await requestAdminModify(id, data).then((res: any) => {
     const { success } = res;
     if (success) {
       message("修改成功", { type: "success" });
@@ -109,7 +112,7 @@ const handleUpRolesDetails = async (data: RequestData, id: string) => {
 };
 
 const handleAdd = async (data: RequestData) => {
-  await requestRoleAdd(data).then(res => {
+  await requestAdminAdd(data).then(res => {
     const { success } = res;
     if (success) {
       message("添加成功", { type: "success" });
@@ -121,16 +124,16 @@ const handleAdd = async (data: RequestData) => {
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  ruleForm.value.permissions = checkList.value.join(",");
   const data = {
-    name: ruleForm.value.name,
-    desc: ruleForm.value.desc,
-    permissions: ruleForm.value.permissions
+    userName: ruleForm.value.userName,
+    password: ruleForm.value.password,
+    nickName: ruleForm.value.nickName,
+    roleId: ruleForm.value.roleId
   };
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (!add) {
-        handleUpRolesDetails(data, ruleForm.value.id);
+        handleUpAdminDetails(data, ruleForm.value.id);
       } else {
         handleAdd(data);
       }
@@ -138,9 +141,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
     formEl.resetFields();
-    checkList.value = [];
+    roleList.value = [];
     setTimeout(() => {
-      RolesDialogVisible.value = false;
+      AdminDialogVisible.value = false;
     }, 500);
   });
 };
@@ -149,27 +152,24 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
   message(`你已取消${add ? "添加" : "修改"}`, { type: "info" });
-  checkList.value = [];
-  RolesDialogVisible.value = false;
+  AdminDialogVisible.value = false;
+  roleList.value = [];
 };
 
-const RolesDialogVisible = defineModel<boolean>();
+const AdminDialogVisible = defineModel<boolean>();
 watch(
-  () => RolesDialogVisible.value,
+  () => AdminDialogVisible.value,
   newVal => {
     if (newVal) {
-      getPermissionsList();
+      getroleList();
     }
   }
 );
 
 watch(
-  () => rolesDetails,
+  () => adminDetails,
   (newVal: RuleForm) => {
     ruleForm.value = { ...newVal };
-    if (!add) {
-      checkList.value = newVal.permissionOnRoles.map(item => item.permissionId);
-    }
   },
   { deep: true }
 );

@@ -6,11 +6,11 @@
       :icon="Plus"
       type="primary"
       @click="otherAdd"
-      >新增角色</el-button
+      >新增权限</el-button
     >
     <el-table :data="tableData">
       <el-table-column fixed="left" :index="index" type="index" label="#" />
-      <el-table-column prop="name" label="名字" align="center" />
+      <el-table-column prop="name" label="权限信息" align="center" />
       <el-table-column
         prop="desc"
         label="描述"
@@ -24,24 +24,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="permissionOnRoles" label="权限" align="center">
-        <template #default="{ row }">
-          <span
-            v-for="item in row.permissionOnRoles"
-            :key="item.id"
-            class="mr-3"
-          >
-            {{ item.permission.name }}
-          </span>
-        </template>
-      </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
         <template #default="{ row }">
           <el-popconfirm
             width="220"
             :icon="InfoFilled"
             icon-color="#F56C6C"
-            title="确定要删除?"
+            title="确定要删除"
             @confirm="handleRemove(row.id)"
           >
             <template #reference>
@@ -67,21 +56,6 @@
               </el-button>
             </template>
           </el-popconfirm>
-          <!-- <el-button
-            v-if="
-              hasPerms([
-                'permission:btn:add',
-                'permission:btn:edit',
-                'permission:btn:delete'
-              ])
-            "
-            type="danger"
-            :icon="Delete"
-            size="small"
-            @click="handleRemove(row.id)"
-          >
-            删除
-          </el-button> -->
           <el-button
             v-if="hasPerms('permission:btn:edit')"
             type="warning"
@@ -105,8 +79,8 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <RolesDialog
-      v-model="RolesDialogVisible"
+    <PermissionDialog
+      v-model="PermissionDialogVisible"
       :add="add"
       :roles-details="rolesDetails"
     />
@@ -118,29 +92,20 @@ import { Edit, Delete, InfoFilled } from "@element-plus/icons-vue";
 import { message } from "@/utils/message";
 import { ref, onMounted, computed, watch } from "vue";
 import { Plus } from "@element-plus/icons-vue";
-import RolesDialog from "../dialog/RolesDialog.vue";
-import { requestRoleDetails, requestRoleDelete } from "@/api/role";
-interface Permission {
-  id: string;
-  name: string;
-  desc: string;
-}
-interface PermissionOnRoles {
-  id: string;
-  roleId: string;
-  permissionId: string;
-  permission: Permission;
-}
+import PermissionDialog from "../dialog/PermissionDialog.vue";
+import {
+  requestPermissionsDetails,
+  requestPermissionsDelete
+} from "@/api/permissions";
 interface TableData {
   id: string;
   name: string;
   desc: string;
-  permissionOnRoles: PermissionOnRoles[];
 }
 
-const RolesDialogVisible = ref(false);
+const PermissionDialogVisible = ref(false);
 watch(
-  () => RolesDialogVisible.value,
+  () => PermissionDialogVisible.value,
   newVal => {
     emit("getData");
   }
@@ -170,8 +135,9 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val;
   emit("updatePage", currentPage.value, pageSize.value);
 };
+
 const handleRemove = async (id: string) => {
-  await requestRoleDelete(id).then((res: any) => {
+  await requestPermissionsDelete(id).then((res: any) => {
     const { success } = res;
     if (success) {
       message("删除成功", { type: "error" });
@@ -183,7 +149,7 @@ const handleRemove = async (id: string) => {
 };
 const handleUpdata = async (id: string) => {
   add.value = false;
-  await requestRoleDetails(id).then((res: any) => {
+  await requestPermissionsDetails(id).then((res: any) => {
     const { data, success } = res;
     if (success) {
       rolesDetails.value = data;
@@ -191,14 +157,14 @@ const handleUpdata = async (id: string) => {
       message("获取数据异常", { type: "error" });
     }
   });
-  RolesDialogVisible.value = true;
+  PermissionDialogVisible.value = true;
 };
 
 const rolesDetails = ref<TableData>();
 const otherAdd = () => {
   add.value = true;
   rolesDetails.value = null;
-  RolesDialogVisible.value = true;
+  PermissionDialogVisible.value = true;
 };
 </script>
 <style lang="scss" scoped></style>

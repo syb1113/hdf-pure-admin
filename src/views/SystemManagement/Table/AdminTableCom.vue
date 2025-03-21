@@ -6,42 +6,31 @@
       :icon="Plus"
       type="primary"
       @click="otherAdd"
-      >新增角色</el-button
+      >新增管理员</el-button
     >
     <el-table :data="tableData">
       <el-table-column fixed="left" :index="index" type="index" label="#" />
-      <el-table-column prop="name" label="名字" align="center" />
+      <el-table-column prop="userName" label="用户名" align="center" />
       <el-table-column
-        prop="desc"
-        label="描述"
+        prop="role"
+        label="角色"
         show-overflow-tooltip
         align="center"
       >
         <template #default="{ row }">
           <span>
-            {{ row.desc ? row.desc : "-" }}
+            {{ row.role ? row.role.name : "-" }}
           </span>
         </template>
       </el-table-column>
 
-      <el-table-column prop="permissionOnRoles" label="权限" align="center">
-        <template #default="{ row }">
-          <span
-            v-for="item in row.permissionOnRoles"
-            :key="item.id"
-            class="mr-3"
-          >
-            {{ item.permission.name }}
-          </span>
-        </template>
-      </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
         <template #default="{ row }">
           <el-popconfirm
             width="220"
             :icon="InfoFilled"
             icon-color="#F56C6C"
-            title="确定要删除?"
+            title="确定要删除"
             @confirm="handleRemove(row.id)"
           >
             <template #reference>
@@ -67,21 +56,6 @@
               </el-button>
             </template>
           </el-popconfirm>
-          <!-- <el-button
-            v-if="
-              hasPerms([
-                'permission:btn:add',
-                'permission:btn:edit',
-                'permission:btn:delete'
-              ])
-            "
-            type="danger"
-            :icon="Delete"
-            size="small"
-            @click="handleRemove(row.id)"
-          >
-            删除
-          </el-button> -->
           <el-button
             v-if="hasPerms('permission:btn:edit')"
             type="warning"
@@ -105,10 +79,10 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <RolesDialog
-      v-model="RolesDialogVisible"
+    <AdminDialog
+      v-model="AdminDialogVisible"
       :add="add"
-      :roles-details="rolesDetails"
+      :admin-details="adminDetails"
     />
   </div>
 </template>
@@ -118,29 +92,27 @@ import { Edit, Delete, InfoFilled } from "@element-plus/icons-vue";
 import { message } from "@/utils/message";
 import { ref, onMounted, computed, watch } from "vue";
 import { Plus } from "@element-plus/icons-vue";
-import RolesDialog from "../dialog/RolesDialog.vue";
-import { requestRoleDetails, requestRoleDelete } from "@/api/role";
-interface Permission {
-  id: string;
-  name: string;
-  desc: string;
-}
-interface PermissionOnRoles {
-  id: string;
-  roleId: string;
-  permissionId: string;
-  permission: Permission;
-}
+import AdminDialog from "../dialog/AdminDialog.vue";
+import { requestAdminDelete, requestAdminDetails } from "@/api/admin";
+
 interface TableData {
-  id: string;
-  name: string;
-  desc: string;
-  permissionOnRoles: PermissionOnRoles[];
+  id?: string;
+  userName: string;
+  password: string;
+  roleId: string;
+  nickName: string;
+  role: Role;
 }
 
-const RolesDialogVisible = ref(false);
+interface Role {
+  id: string;
+  name: string;
+  desc: string;
+}
+
+const AdminDialogVisible = ref(false);
 watch(
-  () => RolesDialogVisible.value,
+  () => AdminDialogVisible.value,
   newVal => {
     emit("getData");
   }
@@ -150,7 +122,6 @@ const { tableData, total } = defineProps<{
   tableData: TableData[];
   total: number;
 }>();
-
 const index = computed(() => {
   return 1 + pageSize.value * (currentPage.value - 1);
 });
@@ -170,8 +141,9 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val;
   emit("updatePage", currentPage.value, pageSize.value);
 };
+
 const handleRemove = async (id: string) => {
-  await requestRoleDelete(id).then((res: any) => {
+  await requestAdminDelete(id).then((res: any) => {
     const { success } = res;
     if (success) {
       message("删除成功", { type: "error" });
@@ -183,22 +155,22 @@ const handleRemove = async (id: string) => {
 };
 const handleUpdata = async (id: string) => {
   add.value = false;
-  await requestRoleDetails(id).then((res: any) => {
+  await requestAdminDetails(id).then((res: any) => {
     const { data, success } = res;
     if (success) {
-      rolesDetails.value = data;
+      adminDetails.value = data;
     } else {
       message("获取数据异常", { type: "error" });
     }
   });
-  RolesDialogVisible.value = true;
+  AdminDialogVisible.value = true;
 };
 
-const rolesDetails = ref<TableData>();
+const adminDetails = ref<TableData>();
 const otherAdd = () => {
   add.value = true;
-  rolesDetails.value = null;
-  RolesDialogVisible.value = true;
+  adminDetails.value = null;
+  AdminDialogVisible.value = true;
 };
 </script>
 <style lang="scss" scoped></style>

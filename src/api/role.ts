@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取角色列表 */
-export const requestRoleList = (params: object) => {
+export const requestRoleList = (params?: object) => {
   return http.request<requestResult>("get", baseUrlAdmin("roles"), {
     params
   });
