@@ -144,7 +144,7 @@ class PureHttp {
         // 判断是否为未授权错误
         if ($error.response && $error.response.data === "Unauthorized") {
           // 跳转到登录页
-          router.push("/login");
+          router.replace("/login");
         }
 
         // 所有的响应异常 区分来源为取消请求/非取消请求
