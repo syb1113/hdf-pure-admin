@@ -26,7 +26,7 @@ export const requestRoleDetails = (id: string) => {
 };
 
 /** 修改角色信息*/
-export const requestRoleModify = (id: string, data: object) => {
+export const requestRoleModify = (data: object, id: string) => {
   return http.request<requestResult>("patch", baseUrlAdmin(`roles/${id}`), {
     data
   });

@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取权限列表 */
-export const requestPermissionsList = (params: object) => {
+export const requestPermissionsList = (params?: object) => {
   return http.request<requestResult>("get", baseUrlAdmin("permissions"), {
     params
   });
