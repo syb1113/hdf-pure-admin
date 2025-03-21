@@ -13,6 +13,7 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import { useRouter } from "vue-router"; // 引入 Vue Router
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -116,6 +117,8 @@ class PureHttp {
   /** 响应拦截 */
   private httpInterceptorsResponse(): void {
     const instance = PureHttp.axiosInstance;
+    const router = useRouter(); // 获取 Vue Router 实例
+
     instance.interceptors.response.use(
       (response: PureHttpResponse) => {
         const $config = response.config;
@@ -137,6 +140,13 @@ class PureHttp {
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
         NProgress.done();
+
+        // 判断是否为未授权错误
+        if ($error.response && $error.response.data === "Unauthorized") {
+          // 跳转到登录页
+          router.push("/login");
+        }
+
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }
