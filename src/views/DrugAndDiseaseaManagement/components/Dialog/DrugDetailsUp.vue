@@ -280,7 +280,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       message("修改失败", { type: "error" });
     }
   });
-  drugDialogVisible.value = false;
+  setTimeout(() => {
+    drugDialogVisible.value = false;
+  }, 500);
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

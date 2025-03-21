@@ -242,7 +242,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   });
   formEl.resetFields();
   await emit("getData");
-  diseaseaAddDialog.value = false;
+  setTimeout(() => {
+    diseaseaAddDialog.value = false;
+  }, 500);
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

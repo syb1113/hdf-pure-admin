@@ -234,7 +234,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   });
   formEl.resetFields();
   await emit("getData");
-  articleDialog.value = false;
+  setTimeout(() => {
+    articleDialog.value = false;
+  }, 500);
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

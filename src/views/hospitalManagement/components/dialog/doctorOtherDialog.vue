@@ -156,12 +156,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         handleAdd();
       }
       message(`${add ? "添加" : "修改"}成功`, { type: "success" });
-      doctorOtherDialogVisible.value = false;
     } else {
       message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
     formEl.resetFields();
-    doctorOtherDialogVisible.value = false;
+    setTimeout(() => {
+      doctorOtherDialogVisible.value = false;
+    }, 500);
   });
 };
 

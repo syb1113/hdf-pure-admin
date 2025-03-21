@@ -224,7 +224,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   });
   formEl.resetFields();
-  drugAddDialog.value = false;
+  setTimeout(() => {
+    drugAddDialog.value = false;
+  }, 500);
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

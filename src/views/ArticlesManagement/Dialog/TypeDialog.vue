@@ -152,7 +152,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
     formEl.resetFields();
-    TypeDialogVisible.value = false;
+    setTimeout(() => {
+      TypeDialogVisible.value = false;
+    }, 500);
   });
 };
 

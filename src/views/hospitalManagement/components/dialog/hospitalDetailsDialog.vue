@@ -328,7 +328,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           }
         });
       }
-      hospitalDetailVisible.value = false;
+      setTimeout(() => {
+        hospitalDetailVisible.value = false;
+      }, 500);
       resetFrom();
       fileList.value.length = 0;
     } else {

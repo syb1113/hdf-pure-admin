@@ -280,7 +280,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           ElMessage.error(errorMessage);
         }
       });
-      doctoreAddVisible.value = false;
+      setTimeout(() => {
+        doctoreAddVisible.value = false;
+      }, 500);
       resetFrom();
       fileList.value.length = 0;
     } else {
