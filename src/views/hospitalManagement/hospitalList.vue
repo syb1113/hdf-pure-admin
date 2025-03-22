@@ -93,7 +93,7 @@ const columns = [
 
 const tableData = ref<Array<TableData>>([]);
 const pages = ref({
-  per: 9, //每页显示的数量
+  per: 5, //每页显示的数量
   page: 1, //页码
   name: ""
 });

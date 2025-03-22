@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      v-model="doctoreAddVisible"
+      v-model="hospitalAddVisible"
       title="新增医院"
       width="800"
       :show-close="false"
@@ -142,7 +142,7 @@ interface RuleForm {
   addressInfo?: string;
 }
 const editorRef = ref(null);
-const doctoreAddVisible = defineModel<boolean>();
+const hospitalAddVisible = defineModel<boolean>();
 const formLabelWidth = "140px";
 const uploadAction = VITE_BASE_URL + "/common/upload";
 const ruleFormRef = ref<FormInstance>();
@@ -281,7 +281,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         }
       });
       setTimeout(() => {
-        doctoreAddVisible.value = false;
+        hospitalAddVisible.value = false;
       }, 500);
       resetFrom();
       fileList.value.length = 0;
@@ -293,7 +293,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  doctoreAddVisible.value = false;
+  hospitalAddVisible.value = false;
   resetFrom();
   fileList.value.length = 0;
   formEl.resetFields();
