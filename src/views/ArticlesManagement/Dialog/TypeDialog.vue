@@ -92,7 +92,9 @@ const onExceed = () => {
   ElMessage.error("最多上传一张图片");
   return;
 };
-
+const emit = defineEmits<{
+  (event: "getData"): void;
+}>();
 const handleUploadSuccess: UploadProps["onSuccess"] = (response, file) => {
   const { success, data } = response;
   if (success) {
@@ -147,11 +149,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       } else {
         handleAdd();
       }
-      TypeDialogVisible.value = false;
     } else {
       message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
     formEl.resetFields();
+    emit("getData");
     setTimeout(() => {
       TypeDialogVisible.value = false;
     }, 500);

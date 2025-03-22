@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog v-model="detailVisible" title="医生详情" width="800">
+    <el-dialog v-model="doctoreDetailVisible" title="医生详情" width="800">
       <el-form ref="ruleFormRef" style="max-width: 800px">
         <el-form-item
           label="医生名称"
@@ -126,7 +126,7 @@
       </el-form>
       <template #footer>
         <div v-if="!disabled" class="dialog-footer">
-          <el-button @click="detailVisible = false">取消</el-button>
+          <el-button @click="doctoreDetailVisible = false">取消</el-button>
           <el-button type="primary" @click="updataDoctor"> 确认 </el-button>
         </div>
       </template>
@@ -159,7 +159,7 @@ interface RuleForm {
 }
 
 const formLabelWidth = "140px";
-const detailVisible = defineModel<boolean>();
+const doctoreDetailVisible = defineModel<boolean>();
 const { doctorDetails, disabled } = defineProps<{
   doctorDetails: RuleForm;
   disabled: boolean;
@@ -209,7 +209,7 @@ const updataDoctor = async () => {
   await requestDoctorModify(form.value.id, data).then((res: any) => {
     const { success } = res;
     if (success) {
-      detailVisible.value = false;
+      doctoreDetailVisible.value = false;
     }
   });
   emit("getData");

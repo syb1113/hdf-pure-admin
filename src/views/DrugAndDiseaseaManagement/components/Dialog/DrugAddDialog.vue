@@ -216,6 +216,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         const { success } = res;
         if (success) {
           message("添加成功", { type: "success" });
+          fileList.value.length = 0;
           emit("getData");
         }
       });

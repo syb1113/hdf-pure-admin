@@ -94,15 +94,12 @@ watch(
   () => TypeDialogVisible.value,
   newVal => {
     // 对话框关闭时获取数据
-    if (!newVal) {
-      emit("getData");
-    }
+    emit("getData");
   }
 );
 
 const { VITE_BASE_URL } = import.meta.env;
-const doctorAvatar =
-  VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg";
+const doctorAvatar = VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png";
 
 const { tableData, total } = defineProps<{
   tableData: TableData[];

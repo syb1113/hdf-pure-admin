@@ -99,7 +99,7 @@ export const useUserStore = defineStore("pure-user", {
             const result = {
               accessToken: res.data,
               avatar:
-                VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg",
+                VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png",
               expires: new Date("2030/10/30 00:00:00"),
               nickname: data.userName,
               permissions: getPermissions(data.userName),

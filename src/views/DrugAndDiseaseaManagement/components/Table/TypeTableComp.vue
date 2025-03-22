@@ -102,8 +102,7 @@ watch(TypeAddDialogVisible, newVal => {
 });
 
 const { VITE_BASE_URL } = import.meta.env;
-const doctorAvatar =
-  VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg";
+const doctorAvatar = VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png";
 
 const { title, tableData, total } = defineProps<{
   title: string;

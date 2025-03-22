@@ -227,22 +227,29 @@ const handleUploadSuccess: UploadProps["onSuccess"] = (response, file) => {
 const getDrugDetails = async (id: string) => {
   await requestOneDrug(id).then((res: any) => {
     const { data, success } = res;
+    console.log(data);
     if (success) {
-      ruleForm.value.name = data.name;
-      ruleForm.value.desc = data.desc;
-      ruleForm.value.price = data.price;
-      ruleForm.value.amount = data.amount;
-      ruleForm.value.image = data.image;
-      ruleForm.value.medicineCategoryId = data.category.name;
-      medicineCategoryId.value = data.medicineCategoryId;
-      categoryName.value = data.category.name;
-      ruleForm.value.illnesses = data.illnessMedicine.map(
-        item => item.illness.name
-      );
-      console.log("ruleForm-->", ruleForm.value);
-      fileList.value.length = 0;
-      if (ruleForm.value.image != "") {
-        fileList.value.push(ruleForm.value.image);
+      ruleForm.value = {
+        ...ruleForm.value,
+        name: data.name,
+        desc: data.desc,
+        price: data.price,
+        amount: data.amount,
+        image: data.image,
+        medicineCategoryId: data.medicineCategoryId,
+        illnesses: data.illnessMedicine.map(item => item.illness.name)
+      };
+      fileList.value = [];
+      if (ruleForm.value.image) {
+        fileList.value = [
+          {
+            name: "image",
+            url: `${VITE_BASE_URL}/${ruleForm.value.image}`.replace(
+              /([^:]\/)\/+/g,
+              "$1"
+            ) // 处理多余的 `/`
+          }
+        ];
       }
     } else {
       message("获取失败", { type: "error" });

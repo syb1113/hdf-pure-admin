@@ -81,12 +81,10 @@ const getHostpitalDetails = async (row: TableData) => {
     }
   });
 };
-const doctorAvatar =
-  VITE_BASE_URL + "/uploads/file-1736770944771-752118396.jpg";
+const doctorAvatar = VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png";
 const columns = [
   { title: "医院名称", dataKey: "name" },
   { title: "医院简介", dataKey: "desc" },
-  { title: "医院详情", dataKey: "content" },
   { title: "医院地址", dataKey: "address" },
   { title: "医院电话", dataKey: "phone" }
 ];

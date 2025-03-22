@@ -6,7 +6,7 @@
         :tableData="tableData"
         :title="'药品分类'"
         :total="total"
-        @get-data="getDiseaseTypeList"
+        @get-data="getDrugTypeList"
         @updatePage="upadatPage"
       />
     </el-card>
@@ -17,7 +17,7 @@
 import SearchBar from "@/views/components/SearchBar/index.vue";
 import TypeTableComp from "./components/Table/TypeTableComp.vue";
 import { ref, onMounted } from "vue";
-import { requestDiseaseTypeList } from "@/api/diseaseManage";
+import { requestDrugTypeList } from "@/api/drugManage";
 import { message } from "@/utils/message";
 const tableData = ref();
 const total = ref(0);
@@ -27,17 +27,17 @@ const pages = ref({
   name: ""
 });
 onMounted(() => {
-  getDiseaseTypeList();
+  getDrugTypeList();
 });
 const upadatPage = (page: number, size: number) => {
   console.log(page, size);
   pages.value.page = page;
   pages.value.per = size;
-  getDiseaseTypeList();
+  getDrugTypeList();
 };
 
-const getDiseaseTypeList = async () => {
-  await requestDiseaseTypeList(pages.value).then((res: any) => {
+const getDrugTypeList = async () => {
+  await requestDrugTypeList(pages.value).then((res: any) => {
     const { data, success } = res;
     if (success) {
       tableData.value = data.list;
@@ -49,7 +49,7 @@ const getDiseaseTypeList = async () => {
 };
 const searchData = (search: string | any) => {
   pages.value.name = search;
-  getDiseaseTypeList();
+  getDrugTypeList();
 };
 </script>
 

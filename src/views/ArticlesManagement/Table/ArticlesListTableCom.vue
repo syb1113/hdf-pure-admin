@@ -64,7 +64,12 @@
         </template>
       </el-table-column>
 
-      <el-table-column fixed="right" align="center" label="操作">
+      <el-table-column
+        fixed="right"
+        align="center"
+        label="操作"
+        min-width="120"
+      >
         <template #default="{ row }">
           <el-button
             v-if="
