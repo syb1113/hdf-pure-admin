@@ -1,6 +1,6 @@
 <template>
   <div class="root">
-    <SearchBar :options-lit="tableData" @search="searchData" />
+    <SearchBar :options-lit="optionsData" @search="searchData" />
     <el-card shadow="always">
       <departmentsTable
         :tableData="tableData"
@@ -27,6 +27,7 @@ interface TableData {
 }
 onMounted(() => {
   getDepartments();
+  getOptions();
 });
 
 const tableData = ref<TableData[]>([]);
@@ -58,6 +59,18 @@ const getDepartments = async () => {
     }
     tableData.value = data.list;
     total.value = data.total;
+  });
+};
+const optionsData = ref<Array<TableData>>([]);
+const getOptions = async () => {
+  await requsestDepartments().then((res: any) => {
+    const { data, success, errorMessage } = res;
+    // console.log(data);
+    if (success) {
+      optionsData.value = data.list;
+    } else {
+      message("获取失败", { type: "error" });
+    }
   });
 };
 </script>

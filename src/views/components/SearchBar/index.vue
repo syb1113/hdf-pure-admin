@@ -60,7 +60,7 @@
 </template>
 <script setup lang="ts">
 import { Search, RefreshLeft } from "@element-plus/icons-vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 
 interface OptionsData {
@@ -81,7 +81,6 @@ const emit = defineEmits<{
   (event: "search", value: string | any, category?: string): void;
 }>();
 const { optionsLit, categoryList = null } = defineProps<definePropsData>();
-
 // const validatePass = (rule: any, value: any, callback: any) => {
 //   if (value === "") {
 //     callback(new Error("请输入关键词(名称)"));

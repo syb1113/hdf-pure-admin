@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取医院列表 */
-export const requestHospitalList = (params: object) => {
+export const requestHospitalList = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin("hospitals"), {
     params
   });
@@ -38,21 +38,23 @@ export const requsestDelHospital = (id: string) => {
 };
 
 /**获取医生职称列表 */
-export const requsestDoctortitles = (params?: object) => {
+export const requsestDoctortitles = (
+  params: object = { page: 1, per: 999 }
+) => {
   return http.request<requestResult>("get", baseUrlAdmin(`doctor_titles`), {
     params
   });
 };
 
 /**获取科室列表 */
-export const requsestDepartments = (params?: object) => {
+export const requsestDepartments = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin(`departments`), {
     params
   });
 };
 
 /**获取医生标签 */
-export const requsestDoctorTags = (params?: object) => {
+export const requsestDoctorTags = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin(`doctor_tags`), {
     params
   });

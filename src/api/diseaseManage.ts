@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取疾病列表 */
-export const requestDiseaseList = (params?: object) => {
+export const requestDiseaseList = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin("illnesses"), {
     params
   });
@@ -38,7 +38,9 @@ export const requsestDelDisease = (id: string) => {
 };
 
 /** 获取疾病分类列表 */
-export const requestDiseaseTypeList = (params?: object) => {
+export const requestDiseaseTypeList = (
+  params: object = { page: 1, per: 999 }
+) => {
   return http.request<requestResult>(
     "get",
     baseUrlAdmin("illness_categories"),

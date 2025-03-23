@@ -1,168 +1,6 @@
-<script setup lang="ts">
-import { hasPerms } from "@/utils/auth";
-import { ref, onMounted, provide, inject } from "vue";
-import { useRouter } from "vue-router";
-import { utils, writeFile } from "xlsx";
-import {
-  requestHospitalList,
-  requestHostpitalDetails
-} from "@/api/hospitalManagement";
-import { message } from "@/utils/message";
-import { Plus } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
-import hospitalAddDialog from "./components/dialog/hospitalAddDialog.vue";
-import hospitalDetailsDialog from "./components/dialog/hospitalDetailsDialog.vue";
-import { requsestDelHospital } from "@/api/hospitalManagement";
-import SearchBar from "@/views/components/SearchBar/index.vue";
-
-const { VITE_BASE_URL } = import.meta.env;
-interface TableData {
-  id: string;
-  name: string;
-  desc: string;
-  content: string;
-  image: string;
-  address: string;
-  phone: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface HostipalData {
-  readonly id: string;
-  name: string;
-  desc: string;
-  image: string;
-  content: string;
-  address: string;
-  phone: string;
-}
-
-onMounted(() => {
-  getData();
-});
-const router = useRouter();
-const hospitalAddVisible = ref<boolean>(false);
-const hospitalDetailVisible = ref<boolean>(false);
-const disabled = ref<boolean>(true);
-const hospitalData = ref<HostipalData>();
-// 详情
-const detailRef = ref(null);
-// const addressStore = useAddressStore();
-const handleClick = (row: TableData) => {
-  const id = row.id;
-  router.push(`/hospitalManagement/hospitalDetails/${id}`);
-};
-
-// 修改
-const updataHospital = (row: TableData) => {
-  getHostpitalDetails(row);
-  hospitalDetailVisible.value = true;
-  disabled.value = false;
-};
-
-const delHospital = async (row: TableData) => {
-  await requsestDelHospital(row.id).then((res: any) => {
-    const { success, errorMessage } = res;
-    if (success) {
-      ElMessage.success("删除成功");
-      getData();
-    } else {
-      ElMessage.error(errorMessage);
-    }
-  });
-};
-
-const getHostpitalDetails = async (row: TableData) => {
-  await requestHostpitalDetails(row.id).then((res: any) => {
-    const { data, success } = res;
-    if (success) {
-      hospitalData.value = data;
-    }
-  });
-};
-const doctorAvatar = VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png";
-const columns = [
-  { title: "医院名称", dataKey: "name" },
-  { title: "医院简介", dataKey: "desc" },
-  { title: "医院地址", dataKey: "address" },
-  { title: "医院电话", dataKey: "phone" }
-];
-
-const tableData = ref<Array<TableData>>([]);
-const pages = ref({
-  per: 5, //每页显示的数量
-  page: 1, //页码
-  name: ""
-});
-const currentPage = ref<number>(1);
-const total = ref<number>(0);
-
-const getData = async () => {
-  await requestHospitalList(pages.value).then((res: any) => {
-    const { data, success, errorMessage } = res;
-    // console.log(data);
-    if (success) {
-      tableData.value = data.list;
-      // console.log(tableData.value);
-      total.value = data.total;
-    } else {
-      message("获取失败", { type: "error" });
-    }
-  });
-};
-
-const searchData = (search: string | any) => {
-  pages.value.name = search;
-  getData();
-};
-
-const handleSizeChange = (val: number) => {
-  pages.value.per = val;
-  getData();
-};
-const handleCurrentChange = (val: number) => {
-  pages.value.page = val;
-  getData();
-};
-const exportExcel = () => {
-  const res = tableData.value.map(item => {
-    return columns.map(column => {
-      return item[column.dataKey];
-    });
-  });
-
-  const titleList = columns.map(column => column.title);
-  res.unshift(titleList);
-  const workSheet = utils.aoa_to_sheet(res);
-  // 计算列宽
-  const colWidths = columns.map((_, colIndex) => {
-    // 获取该列所有单元格内容的最大长度
-    const maxWidth = res.reduce((acc, row) => {
-      const cellValue = row[colIndex] || "";
-      const length = cellValue.toString().length;
-      return Math.max(acc, length);
-    }, columns[colIndex].title.length); // 初始值为标题长度
-
-    // 根据字符长度设置列宽（系数可以调整）
-    return { wch: maxWidth * 2 }; // 1.5倍字符长度作为列宽
-  });
-
-  workSheet["!cols"] = colWidths; // 设置列宽
-  const workBook = utils.book_new();
-
-  utils.book_append_sheet(workBook, workSheet, "数据报表");
-  writeFile(workBook, "医院列表.xlsx");
-};
-
-const requestHospitalAdd = () => {
-  hospitalAddVisible.value = true;
-};
-</script>
-
 <template>
   <div class="root">
-    <SearchBar :options-lit="tableData" @search="searchData" />
+    <SearchBar :options-lit="optionsData" @search="searchData" />
 
     <el-card shadow="always">
       <el-button
@@ -244,4 +82,177 @@ const requestHospitalAdd = () => {
   </div>
 </template>
 
+<script setup lang="ts">
+import { hasPerms } from "@/utils/auth";
+import { ref, onMounted, provide, inject } from "vue";
+import { useRouter } from "vue-router";
+import { utils, writeFile } from "xlsx";
+import {
+  requestHospitalList,
+  requestHostpitalDetails
+} from "@/api/hospitalManagement";
+import { message } from "@/utils/message";
+import { Plus } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
+import hospitalAddDialog from "./components/dialog/hospitalAddDialog.vue";
+import hospitalDetailsDialog from "./components/dialog/hospitalDetailsDialog.vue";
+import { requsestDelHospital } from "@/api/hospitalManagement";
+import SearchBar from "@/views/components/SearchBar/index.vue";
+
+const { VITE_BASE_URL } = import.meta.env;
+interface TableData {
+  id: string;
+  name: string;
+  desc: string;
+  content: string;
+  image: string;
+  address: string;
+  phone: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface HostipalData {
+  readonly id: string;
+  name: string;
+  desc: string;
+  image: string;
+  content: string;
+  address: string;
+  phone: string;
+}
+
+onMounted(() => {
+  getData();
+  getOptions();
+});
+const router = useRouter();
+const hospitalAddVisible = ref<boolean>(false);
+const hospitalDetailVisible = ref<boolean>(false);
+const disabled = ref<boolean>(true);
+const hospitalData = ref<HostipalData>();
+// 详情
+const detailRef = ref(null);
+// const addressStore = useAddressStore();
+const handleClick = (row: TableData) => {
+  const id = row.id;
+  router.push(`/hospitalManagement/hospitalDetails/${id}`);
+};
+
+// 修改
+const updataHospital = (row: TableData) => {
+  getHostpitalDetails(row);
+  hospitalDetailVisible.value = true;
+  disabled.value = false;
+};
+
+const delHospital = async (row: TableData) => {
+  await requsestDelHospital(row.id).then((res: any) => {
+    const { success, errorMessage } = res;
+    if (success) {
+      ElMessage.success("删除成功");
+      getData();
+    } else {
+      ElMessage.error(errorMessage);
+    }
+  });
+};
+
+const getHostpitalDetails = async (row: TableData) => {
+  await requestHostpitalDetails(row.id).then((res: any) => {
+    const { data, success } = res;
+    if (success) {
+      hospitalData.value = data;
+    }
+  });
+};
+const doctorAvatar = VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png";
+const columns = [
+  { title: "医院名称", dataKey: "name" },
+  { title: "医院简介", dataKey: "desc" },
+  { title: "医院地址", dataKey: "address" },
+  { title: "医院电话", dataKey: "phone" }
+];
+
+const tableData = ref<Array<TableData>>([]);
+const pages = ref({
+  per: 5, //每页显示的数量
+  page: 1, //页码
+  name: ""
+});
+const currentPage = ref<number>(1);
+const total = ref<number>(0);
+
+const getData = async () => {
+  await requestHospitalList(pages.value).then((res: any) => {
+    const { data, success, errorMessage } = res;
+    // console.log(data);
+    if (success) {
+      tableData.value = data.list;
+      total.value = data.total;
+    } else {
+      message("获取失败", { type: "error" });
+    }
+  });
+};
+const optionsData = ref<Array<TableData>>([]);
+const getOptions = async () => {
+  await requestHospitalList().then((res: any) => {
+    const { data, success, errorMessage } = res;
+    // console.log(data);
+    if (success) {
+      optionsData.value = data.list;
+    } else {
+      message("获取失败", { type: "error" });
+    }
+  });
+};
+
+const searchData = (search: string | any) => {
+  pages.value.name = search;
+  getData();
+};
+
+const handleSizeChange = (val: number) => {
+  pages.value.per = val;
+  getData();
+};
+const handleCurrentChange = (val: number) => {
+  pages.value.page = val;
+  getData();
+};
+const exportExcel = () => {
+  const res = optionsData.value.map(item => {
+    return columns.map(column => {
+      return item[column.dataKey];
+    });
+  });
+
+  const titleList = columns.map(column => column.title);
+  res.unshift(titleList);
+  const workSheet = utils.aoa_to_sheet(res);
+  // 计算列宽
+  const colWidths = columns.map((_, colIndex) => {
+    // 获取该列所有单元格内容的最大长度
+    const maxWidth = res.reduce((acc, row) => {
+      const cellValue = row[colIndex] || "";
+      const length = cellValue.toString().length;
+      return Math.max(acc, length);
+    }, columns[colIndex].title.length); // 初始值为标题长度
+
+    // 根据字符长度设置列宽（系数可以调整）
+    return { wch: maxWidth * 2 }; // 1.5倍字符长度作为列宽
+  });
+
+  workSheet["!cols"] = colWidths; // 设置列宽
+  const workBook = utils.book_new();
+
+  utils.book_append_sheet(workBook, workSheet, "数据报表");
+  writeFile(workBook, "医院列表.xlsx");
+};
+
+const requestHospitalAdd = () => {
+  hospitalAddVisible.value = true;
+};
+</script>
 <style lang="scss" scoped></style>

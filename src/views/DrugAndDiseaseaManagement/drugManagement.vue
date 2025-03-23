@@ -64,6 +64,19 @@ const getDrugList = async () => {
     }
   });
 };
+
+const optionsData = ref([]);
+const getOptions = async () => {
+  await requestDrugList().then((res: any) => {
+    const { data, success, errorMessage } = res;
+    // console.log(data);
+    if (success) {
+      optionsData.value = data.list;
+    } else {
+      message("获取失败", { type: "error" });
+    }
+  });
+};
 const searchData = (search: string | any, category: string) => {
   pages.value.name = search;
   pages.value.category = category;

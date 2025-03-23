@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取文章列表 */
-export const requestArticlesList = (params?: object) => {
+export const requestArticlesList = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin("articles"), {
     params
   });

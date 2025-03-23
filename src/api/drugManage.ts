@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取药品列表 */
-export const requestDrugList = (params: object) => {
+export const requestDrugList = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin("medicines"), {
     params
   });
@@ -38,7 +38,7 @@ export const requsestDelDrug = (id: string) => {
 };
 
 /** 获取药品分类列表 */
-export const requestDrugTypeList = (params?: object) => {
+export const requestDrugTypeList = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>(
     "get",
     baseUrlAdmin("medicine_categories"),

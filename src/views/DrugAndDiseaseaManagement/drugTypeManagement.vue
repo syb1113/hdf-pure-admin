@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SearchBar :options-lit="tableData" @search="searchData" />
+    <SearchBar :options-lit="optionsData" @search="searchData" />
     <el-card>
       <TypeTableComp
         :tableData="tableData"
@@ -28,6 +28,7 @@ const pages = ref({
 });
 onMounted(() => {
   getDrugTypeList();
+  getOptions();
 });
 const upadatPage = (page: number, size: number) => {
   console.log(page, size);
@@ -42,6 +43,19 @@ const getDrugTypeList = async () => {
     if (success) {
       tableData.value = data.list;
       total.value = data.total;
+    } else {
+      message("获取失败", { type: "error" });
+    }
+  });
+};
+
+const optionsData = ref([]);
+const getOptions = async () => {
+  await requestDrugTypeList().then((res: any) => {
+    const { data, success, errorMessage } = res;
+    // console.log(data);
+    if (success) {
+      optionsData.value = data.list;
     } else {
       message("获取失败", { type: "error" });
     }
