@@ -17,7 +17,11 @@
         @updatePage="upadatPage"
       />
     </el-card>
-    <DiseaseDialog v-model="diseaseaAddDialog" :disabled="false" />
+    <DiseaseDialog
+      v-model="diseaseaAddDialog"
+      :disabled="false"
+      :diseaseaId="diseaseaId"
+    />
   </div>
 </template>
 
@@ -63,9 +67,10 @@ const searchData = (search: string | any) => {
   pages.value.name = search;
   getDiseaseList();
 };
-
+const diseaseaId = ref();
 const diseaseaAddDialog = ref<boolean>(false);
 const diseaseAdd = () => {
+  diseaseaId.value = "";
   diseaseaAddDialog.value = true;
 };
 </script>

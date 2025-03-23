@@ -147,15 +147,14 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         handleAdd();
       }
       message(`${add ? "添加" : "修改"}成功`, { type: "success" });
-      TypeAddDialogVisible.value = false;
     } else {
       message(`${add ? "添加" : "修改"}失败`, { type: "error" });
     }
     formEl.resetFields();
-    setTimeout(() => {
-      TypeAddDialogVisible.value = false;
-    }, 500);
   });
+  setTimeout(() => {
+    TypeAddDialogVisible.value = false;
+  }, 500);
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

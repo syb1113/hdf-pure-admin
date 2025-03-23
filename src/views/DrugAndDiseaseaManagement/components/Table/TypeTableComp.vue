@@ -96,10 +96,13 @@ interface TableData {
 }
 const TypeAddDialogVisible = ref(false);
 
-watch(TypeAddDialogVisible, newVal => {
-  // 对话框关闭时获取数据
-  emit("getData");
-});
+watch(
+  () => TypeAddDialogVisible.value,
+  newVal => {
+    // 对话框关闭时获取数据
+    emit("getData");
+  }
+);
 
 const { VITE_BASE_URL } = import.meta.env;
 const doctorAvatar = VITE_BASE_URL + "/uploads/file-1742645674476-49344101.png";

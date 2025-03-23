@@ -88,7 +88,14 @@
 </template>
 <script setup lang="ts">
 import { message } from "@/utils/message";
-import { reactive, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import {
+  reactive,
+  ref,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  defineModel
+} from "vue";
 import type { ComponentSize, FormInstance, FormRules } from "element-plus";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { ElMessage } from "element-plus";
