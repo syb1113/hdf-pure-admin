@@ -163,9 +163,9 @@ watch(
 );
 interface definePropsData {
   disabled: boolean;
-  diseaseaId?: string;
+  diseaseaId?: string | null;
 }
-const { disabled, diseaseaId } = defineProps<definePropsData>();
+const { disabled, diseaseaId = "" } = defineProps<definePropsData>();
 
 const emit = defineEmits<{
   (event: "getData"): void;
@@ -175,7 +175,6 @@ const getDiseaseTypeList = async () => {
     const { data, success } = res;
     if (success) {
       categoryList.value = data.list;
-      console.log("categoryList-->", categoryList.value);
     }
   });
 };
@@ -219,27 +218,25 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      if (!diseaseaId) {
-        requestAddDisease(ruleForm.value).then(res => {
-          const { success } = res;
-          if (success) {
-            message("添加成功", { type: "success" });
-          }
-        });
-      } else {
-        const data = {
-          name: ruleForm.value.name,
-          desc: ruleForm.value.desc,
-          image: ruleForm.value.image,
-          content: ruleForm.value.content,
-          illnessCategoryId: ruleForm.value.illnessCategoryId
-        };
-        console.log("data-->", data);
-
+      const data = {
+        name: ruleForm.value.name,
+        desc: ruleForm.value.desc,
+        image: ruleForm.value.image,
+        content: ruleForm.value.content,
+        illnessCategoryId: ruleForm.value.illnessCategoryId
+      };
+      if (diseaseaId !== "") {
         requestEditDisease(diseaseaId, data).then(res => {
           const { success } = res;
           if (success) {
             message("修改成功", { type: "success" });
+          }
+        });
+      } else {
+        requestAddDisease(data).then(res => {
+          const { success } = res;
+          if (success) {
+            message("添加成功", { type: "success" });
           }
         });
       }
