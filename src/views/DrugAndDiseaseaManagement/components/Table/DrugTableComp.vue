@@ -39,7 +39,7 @@
       </el-table-column>
       <el-table-column prop="category" align="center" label="药物类型">
         <template #default="{ row }">
-          <div>{{ row.category.name }}</div>
+          <div>{{ row.category ? row.category.name : "-" }}</div>
         </template>
       </el-table-column>
       <el-table-column label="关联疾病" align="center" min-width="100">
@@ -50,7 +50,7 @@
               :key="item.id"
               class="mr-1"
               type="success"
-              >{{ item ? item.illness.name : "-" }}</el-tag
+              >{{ item.illness ? item.illness.name : "-" }}</el-tag
             >
           </div>
         </template>

@@ -217,7 +217,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         if (success) {
           message("添加成功", { type: "success" });
           fileList.value.length = 0;
-          emit("getData");
         }
       });
     } else {
@@ -225,6 +224,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   });
   formEl.resetFields();
+  emit("getData");
   setTimeout(() => {
     drugAddDialog.value = false;
   }, 500);

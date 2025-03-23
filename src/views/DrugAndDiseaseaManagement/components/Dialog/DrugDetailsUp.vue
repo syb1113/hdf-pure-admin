@@ -281,7 +281,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       ruleForm.value.illnesses = illnesses;
       ruleForm.value.price = Number(ruleForm.value.price);
       ruleForm.value.amount = parseInt(ruleForm.value.amount);
-      console.log("ruleForm-->", ruleForm.value);
       upDrugDetails();
     } else {
       message("修改失败", { type: "error" });

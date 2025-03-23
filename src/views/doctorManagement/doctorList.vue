@@ -41,7 +41,7 @@
           >
             <template #default="{ row }">
               <el-text class="mx-1">{{
-                row.departmentInfo.name ? row.departmentInfo.name : "-"
+                row.departmentInfo ? row.departmentInfo.name : "-"
               }}</el-text>
             </template> </el-table-column
           ><el-table-column
@@ -51,7 +51,7 @@
           >
             <template #default="{ row }">
               <el-text class="mx-1">{{
-                row.doctorTitleInfo.name ? row.doctorTitleInfo.name : "-"
+                row.doctorTitleInfo ? row.doctorTitleInfo.name : "-"
               }}</el-text>
             </template> </el-table-column
           ><el-table-column
@@ -61,21 +61,21 @@
           >
             <template #default="{ row }">
               <el-text class="mx-1">{{
-                row.hospitalInfo.name ? row.hospitalInfo.name : "-"
+                row.hospitalInfo ? row.hospitalInfo.name : "-"
               }}</el-text>
             </template>
           </el-table-column>
           <el-table-column prop="phone" label="医院电话" width="120">
             <template #default="{ row }">
               <el-text class="mx-1">{{
-                row.hospitalInfo.phone ? row.hospitalInfo.phone : "-"
+                row.hospitalInfo ? row.hospitalInfo.phone : "-"
               }}</el-text>
             </template>
           </el-table-column>
           <el-table-column prop="address" label="医院地址" min-width="200">
             <template #default="{ row }">
               <el-text class="mx-1">{{
-                row.hospitalInfo.address ? row.hospitalInfo.address : "-"
+                row.hospitalInfo ? row.hospitalInfo.address : "-"
               }}</el-text>
             </template>
           </el-table-column>
@@ -233,7 +233,6 @@ const columns = [
   { title: "医生名字", dataKey: "name" },
   { title: "医生简介", dataKey: "desc" },
   { title: "医生特长", dataKey: "tags" },
-  { title: "医生描述", dataKey: "content" },
   { title: "医生部门", dataKey: item => item.departmentInfo?.name },
   { title: "医生职位", dataKey: item => item.doctorTitleInfo?.name },
   { title: "所属医院", dataKey: item => item.hospitalInfo?.name },
@@ -270,8 +269,20 @@ const handleCurrentChange = (val: number) => {
   pages.value.page = val;
   getData();
 };
-const exportExcel = () => {
-  const res = tableData.value.map(item => {
+const excelData = ref([]);
+const getExcelData = async () => {
+  await requestDoctoresList().then((res: any) => {
+    const { data, success, errorMessage } = res;
+    if (success) {
+      excelData.value = data.list;
+    } else {
+      message("获取失败", { type: "error" });
+    }
+  });
+};
+const exportExcel = async () => {
+  await getExcelData();
+  const res = excelData.value.map(item => {
     return columns.map(column => {
       if (typeof column.dataKey === "function") {
         return column.dataKey(item);

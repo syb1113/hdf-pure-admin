@@ -27,7 +27,7 @@
       />
       <el-table-column prop="illnessCategory" align="center" label="疾病类型">
         <template #default="{ row }">
-          <div>{{ row.illnessCategory.name }}</div>
+          <div>{{ row.illnessCategory ? row.illnessCategory.name : "-" }}</div>
         </template>
       </el-table-column>
       <el-table-column fixed="right" align="center" label="操作">

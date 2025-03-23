@@ -7,7 +7,7 @@ export type requestResult = {
 };
 
 /** 获取医生列表 */
-export const requestDoctoresList = (params: object) => {
+export const requestDoctoresList = (params: object = { page: 1, per: 999 }) => {
   return http.request<requestResult>("get", baseUrlAdmin("doctors"), {
     params
   });
