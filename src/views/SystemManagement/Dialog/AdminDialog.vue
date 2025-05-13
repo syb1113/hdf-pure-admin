@@ -94,6 +94,11 @@ const ruleForm = ref<RuleForm>({
   ...adminDetails
 });
 const roleList = ref([]);
+const roleNamePrefixMap = {
+  普通用户: "user",
+  普通管理员: "common",
+  超级管理员: "admin"
+};
 const rules = reactive<FormRules<RuleForm>>({
   userName: [
     { required: true, message: "请输入用户名", trigger: "blur" },
@@ -124,11 +129,6 @@ const rules = reactive<FormRules<RuleForm>>({
   ],
   roleId: [{ required: true, message: "请选择权限", trigger: "blur" }]
 });
-const roleNamePrefixMap = {
-  普通用户: "user",
-  普通管理员: "common",
-  超级管理员: "admin"
-};
 
 const handleRoleChange = () => {
   ruleFormRef.value?.validateField("userName");

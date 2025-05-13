@@ -305,7 +305,7 @@ const exportExcel = async () => {
     }, columns[colIndex].title.length); // 初始值为标题长度
 
     // 根据字符长度设置列宽（系数可以调整）
-    return { wch: maxWidth * 2 }; // 1.5倍字符长度作为列宽
+    return { wch: maxWidth * 2 }; // 2倍字符长度作为列宽
   });
 
   workSheet["!cols"] = colWidths; // 设置列宽
